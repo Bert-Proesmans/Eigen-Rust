@@ -1,0 +1,11 @@
+[package]
+name = "eigen_rust"
+version = "0.1.0"
+authors = ["Bert Proesmans <bproesmans@hotmail.com>"]
+
+[dependencies]
+# Provides macro's for collection creation.
+maplit = "0.1.4"
+# Allows dynamic allocations (hashmap and others) within static
+# variables through lazy evaluation.
+lazy_static = "0.2"
