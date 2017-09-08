@@ -1,17 +1,23 @@
 use std::collections::HashMap;
 
 use core::Card;
-use enums::{ECardSets, EGameTags, ECardTypes};
+use enums::{ECardSets, ECardTypes, EGameTags};
 
-// All card implementations MUST be implemented between the lazy_static! tags.
-// The macro builts the object during runtime on first access.
-// The static variable contains a reference to the implemented object.
-// => obj: type = &something <=> ref obj: type = something <=
+// All card implementations MUST be implemented between the
+// lazy_static! tags.
+// The macro builts the object during runtime on first
+// access.
+// The static variable contains a reference to the
+// implemented object.
+// => obj: type = &something <=> ref obj: type = something
+// <=
 lazy_static! {
 
     pub static ref EX1_323H: Card = card! {
         id: "EX1_323h", // First argument MUST BE the card ID!
-        name: "Lord Jaraxxus",
+        name: "Lord Jaraxxus",  // Name in the default language (English), i'm thinking about having
+                                // the possibility to extend cardcontainer to deliver translated
+                                // cardnames to the wrapping code.
         kind: ECardTypes::Minion,
         set: ECardSets::Expert1,
 
@@ -24,13 +30,14 @@ lazy_static! {
         // matching EGameTag within card_data (see the debug output of this card for validation)!
         card_data: hashmap!{EGameTags::Battlecry => 0, EGameTags::Cost => 0},
 
-        // These field can be optionally set if needed.. they can also be ommitted.
+        // These fields can be optionally set if needed.. they can also be ommitted.
         entourage: None,
         play_requirements: None,
         reference_tags: Some(hashmap!{}),
         effects: None,
     };
 
+    // Collect all cards of the set into this hashmap.
     pub static ref FULL_SET: HashMap<&'static str, &'static Card> = hashmap!{
         "EX1_323h" => &*EX1_323H
     };

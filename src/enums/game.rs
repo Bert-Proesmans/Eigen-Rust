@@ -1,72 +1,88 @@
-
 #[derive(Debug)]
 pub enum EGameSteps {
-        /// <summary>The entry point (first executed step) of the simulated game.</summary>
-        OpeningStart,
+    /// <summary>The entry point (first executed step) of
+    /// the simulated game.</summary>
+    OpeningStart,
 
-        /// <summary>The deck shuffle step.</summary>
-        OpeningShuffle,
+    /// <summary>The deck shuffle step.</summary>
+    OpeningShuffle,
 
-        /// <summary>The where all cards for mulligan are drawn.</summary>
-        OpeningDraw,
+    /// <summary>The where all cards for mulligan are
+    /// drawn.</summary>
+    OpeningDraw,
 
-        /// <summary>
-        /// The step where the mulligan choices are prepared.
-        /// Players have to process their mulligan choices during this step.
-        /// Set <see cref="MAIN_BEGIN"/> as next step to end the mulligan phase and start
-        /// actually simulating player/game interactions.
-        /// </summary>
-        PhaseMulligan,
+    /// <summary>
+    /// The step where the mulligan choices are prepared.
+    /// Players have to process their mulligan choices
+    /// during this step.
+    /// Set <see cref="MAIN_BEGIN"/> as next step to end
+    /// the mulligan phase and start
+    /// actually simulating player/game interactions.
+    /// </summary>
+    PhaseMulligan,
 
-        /// <summary>The entry point of the simulation phase.</summary>
-        MainBegin,
+    /// <summary>The entry point of the simulation
+    /// phase.</summary>
+    MainBegin,
 
-        /// <summary>The step which resets all information of game entities related to
-        /// turn information.</summary>
-        MainReady,
+    /// <summary>The step which resets all information of
+    /// game entities related to
+    /// turn information.</summary>
+    MainReady,
 
-        /// <summary>The step which activates all triggers listening on 'start of turn' events.
-        /// </summary>
-        TurnStartTriggers,
+    /// <summary>The step which activates all triggers
+    /// listening on 'start of turn' events.
+    /// </summary>
+    TurnStartTriggers,
 
-        /// <summary>The step where available resources (mana) are calculated.</summary>
-        TurnResource,
+    /// <summary>The step where available resources (mana)
+    /// are calculated.</summary>
+    TurnResource,
 
-        /// <summary>The step where the current player draws his card(s) for this turn.</summary>
-        TurnDraw,
+    /// <summary>The step where the current player draws
+    /// his card(s) for this turn.</summary>
+    TurnDraw,
 
-        /// <summary>Intermediate step to process all queued game operations before the player
-        /// can perform actions.</summary>
-        TurnStart,
+    /// <summary>Intermediate step to process all queued
+    /// game operations before the player
+    /// can perform actions.</summary>
+    TurnStart,
 
-        /// <summary>The step which allows the current player to give the game <see cref="ITask"/>s
-        /// to process.</summary>
-        TurnAction,
+    /// <summary>The step which allows the current player
+    /// to give the game <see cref="ITask"/>s
+    /// to process.</summary>
+    TurnAction,
 
-        /// <summary>The step where an <see cref="ICharacter"/> attacks another
-        /// <see cref="ICharacter"/>.</summary>
-        TurnCombat,
+    /// <summary>The step where an <see cref="ICharacter"/>
+    /// attacks another
+    /// <see cref="ICharacter"/>.</summary>
+    TurnCombat,
 
-        /// <summary>The step to process queued game operations.
-        /// Mostly manually called after an operation during <see cref="TURN_ACTION"/> has
-        /// finished processing.
-        /// </summary>
-        TurnProcess,
+    /// <summary>The step to process queued game operations.
+    /// Mostly manually called after an operation during
+    /// <see cref="TURN_ACTION"/> has
+    /// finished processing.
+    /// </summary>
+    TurnProcess,
 
-        /// <summary>The step which activates triggers waiting for the 'end turn' event.
-        /// </summary>
-        TurnEndTriggers,
+    /// <summary>The step which activates triggers waiting
+    /// for the 'end turn' event.
+    /// </summary>
+    TurnEndTriggers,
 
-        /// <summary>The step which changes the current player and completes entity information.
-        /// </summary>
-        MainNext,
+    /// <summary>The step which changes the current player
+    /// and completes entity information.
+    /// </summary>
+    MainNext,
 
-        /// <summary>The step used to calculate winners/losers and complete entity information.
-        /// </summary>
-        FinalWrapup,
+    /// <summary>The step used to calculate winners/losers
+    /// and complete entity information.
+    /// </summary>
+    FinalWrapup,
 
-        /// <summary>The step which marks the end of the game.</summary>
-        FinalGameover,
+    /// <summary>The step which marks the end of the
+    /// game.</summary>
+    FinalGameover,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -75,16 +91,16 @@ pub enum EFormats {
     Standard,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 #[repr(u32)]
 pub enum EZones {
-     Play = 1,
-     Deck = 2,
-     Hand = 3,
-     Graveyard = 4,
-     Removedfromgame = 5,
-     Setaside = 6,
-     Secret = 7,
+    Play = 1,
+    Deck = 2,
+    Hand = 3,
+    Graveyard = 4,
+    Removedfromgame = 5,
+    Setaside = 6,
+    Secret = 7,
 }
 
 // TODO; Remove integers
@@ -160,11 +176,10 @@ pub enum EPlayRequirements {
     ReqNotDisabledHeroPower = 68,
     ReqMustPlayOtherCardFirst = 69,
     ReqHandNotFull = 70,
-    ReqDragToPlay = 71
+    ReqDragToPlay = 71,
 }
 
-// TODO; Remove integers
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 pub enum EGameTags {
     IgnoreDamage = 1,
     TagScriptDataNum1 = 2,
@@ -175,8 +190,8 @@ pub enum EGameTags {
     Timeout = 7,
     TurnStart = 8,
     TurnTimerSlush = 9,
-    //10 GameTag, seems set to 85 always seconds?
-    //11 MinionTag, Controller, ??? used with Potion of Madness  (11 newController,Charge,333 oldController)
+    // 10 GameTag, seems set to 85 always seconds?
+    // 11 MinionTag, Controller, ??? used with Potion of Madness  (11 newController,Charge,333 oldController)
     Premium = 12,
     GoldRewardState = 13,
     Playstate = 17,
@@ -327,20 +342,20 @@ pub enum EGameTags {
     NumMinionsPlayedThisTurn = 317,
     Predamage = 318,
     Collectible = 321,
-    //323 EnchantmentTag, true ... when weapon equipped
-    //324 EnchantmentTag
+    // 323 EnchantmentTag, true ... when weapon equipped
+    // 324 EnchantmentTag
     TargetingArrowText = 325,
     EnchantmentBirthVisual = 330,
     EnchantmentIdleVisual = 331,
     CantBeTargetedByHeroPowers = 332,
-    //333 MinionTag, turns till effect? Or controller change after turn?
+    // 333 MinionTag, turns till effect? Or controller change after turn?
     Weapon = 334,
     InvisibleDeathrattle = 335,
     HealthMinimum = 337,
     TagOneTurnEffect = 338,
     Silence = 339,
     Counter = 340,
-    //341 MinionTag, true/false
+    // 341 MinionTag, true/false
     Artistname = 342,
     LocalizationNotes = 344,
     HandRevealed = 348,
@@ -399,7 +414,7 @@ pub enum EGameTags {
     HeropowerAdditionalActivations = 405,
     HeropowerActivationsThisTurn = 406,
     Revealed = 410,
-    //411 IMPLEMENTED
+    // 411 IMPLEMENTED
     NumFriendlyMinionsThatDiedThisGame = 412,
     CannotAttackHeroes = 413,
     LockAndLoad = 414,
@@ -443,8 +458,8 @@ pub enum EGameTags {
     PendingEvolutions = 461,
     Quest = 462,
     TagLastKnownCostInHand = 466,
-    //467 IMPLEMENTED
-    //468 IMPLEMENTED
+    // 467 IMPLEMENTED
+    // 468 IMPLEMENTED
     DefiningEnchantment = 469,
     FinishAttackSpellOnDamage = 470,
     ModularEntityPart1 = 471,
@@ -455,7 +470,7 @@ pub enum EGameTags {
     MultipleClasses = 476,
     AllTargetsRandom = 477,
     // 478, true on quest cards ???
-    //479 IMPLEMENTED
+    // 479 IMPLEMENTED
     MultiClassGroup = 480,
     CardCostsHealth = 481,
     GrimyGoons = 482,
@@ -493,7 +508,7 @@ pub enum EGameTags {
     HiddenChoice = 813,
     Zombeast = 823,
     // more or less guessed gametags
-    ExtraBattlecry = 411, //ControllerTag, true/false Bronzebard Extra Battlecry
+    ExtraBattlecry = 411, // ControllerTag, true/false Bronzebard Extra Battlecry
     NumSpellsPlayedThisTurn = 430, // need to implement it ^^
     NumCardsToDraw = 467,
     MoatLurkerMinion = 468,
@@ -506,5 +521,5 @@ pub enum EGameTags {
     NumElementalPlayedThisTurn = 1006,
     NumElementalPlayedLastTurn = 1007,
     NumMurlocsPlayedThisGame = 1008,
-    TagLastKnownPositionOnBoard = 1009 // position aren't changed in graveyard and setaside zone ??? obolet?
+    TagLastKnownPositionOnBoard = 1009, // position aren't changed in graveyard and setaside zone ??? obolet?
 }

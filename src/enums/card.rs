@@ -1,7 +1,6 @@
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Primitive)]
 #[repr(u32)]
 pub enum ERarities {
-    Invalid = 0,
     Common = 1,
     Free = 2,
     Rare = 3,
@@ -10,7 +9,7 @@ pub enum ERarities {
     Unknown6 = 6,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 #[repr(u32)]
 pub enum ECardClasses {
     Deathknight = 1,
@@ -27,7 +26,7 @@ pub enum ECardClasses {
     Neutral = 12,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Primitive)]
 #[repr(u32)]
 pub enum ERace {
     Bloodelf = 1,
@@ -56,7 +55,7 @@ pub enum ERace {
     Dragon = 24,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 #[repr(u32)]
 pub enum ECardTypes {
     Invalid = 0, // Needs default value!
@@ -74,10 +73,9 @@ pub enum ECardTypes {
     HeroPower = 10,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 #[repr(u32)]
 pub enum ECardSets {
-    Invalid = 0, // Needs default value!
     TestTemporary = 1,
     Core = 2,
     Expert1 = 3,

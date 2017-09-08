@@ -1,0 +1,38 @@
+write_mode = "Overwrite"
+error_on_line_overflow = true
+wrap_comments = true
+# This prevents the formatter from taking formatting hints from the source itself.
+take_source_hints = false
+# Don't replace the obvious 'try!' macro with the non-obvious '?' macro
+use_try_shorthand = false
+format_strings = true
+
+# Default the maximum line width to 120 characters.
+# Shorten to half if readability could be an issue.
+max_width = 120
+chain_one_line_max = 120
+array_width = 120
+comment_width = 60
+fn_call_width = 120
+single_line_if_else_max_width = 60
+
+# Simple visual things; don't push different things into the same line.
+normalize_comments = true
+reorder_imports = true
+reorder_imported_names = true
+reorder_imports_in_group = true
+attributes_on_same_line_as_field = false
+attributes_on_same_line_as_variant = false
+
+control_style = "Rfc"
+where_style = "Rfc"
+
+chain_split_single_child = false
+match_block_trailing_comma = true
+
+fn_return_indent = "WithWhereClause"
+array_layout = "Block"
+chain_indent = "Visual"
+struct_lit_style = "Block"
+multiline_closure_forces_block = true
+multiline_match_arm_forces_block = true

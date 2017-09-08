@@ -1,10 +1,10 @@
-use std::fmt;
 use std::collections::HashMap;
+use std::fmt;
 
-use contracts::models::ICard;
 use contracts::effects::IEffect;
+use contracts::models::ICard;
 
-use enums::{EGameTags, EPlayRequirements, ECardSets, ERarities, ECardClasses, ECardTypes};
+use enums::{ECardSets, ECardTypes, EGameTags, EPlayRequirements};
 
 #[derive(Debug, Default)]
 pub struct Card {
@@ -18,7 +18,7 @@ pub struct Card {
     pub health: u32,
     pub cost: u32,
     // TODO; Add more explicit card properties!
-
+    //
     // Some cards need the following fields implemented.
     pub entourage: Option<Vec<&'static str>>,
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
@@ -27,11 +27,13 @@ pub struct Card {
     pub card_data: HashMap<EGameTags, u32>,
 }
 
-/*
- * Force implement the Sync trait since we guarantee ourselves that we won't
- * mutate the contents of card_data_internal concurrent within multiple threads.
- * -> Except for the finalize method we'll NEVER edit the contents of card_data_internal!
- */
+// Force implement the Sync trait since we guarantee
+// ourselves that we won't
+// mutate the contents of card_data_internal concurrent
+// within multiple threads.
+// -> Except for the finalize method we'll NEVER edit the
+// contents of card_data_internal!
+//
 unsafe impl Sync for Card {}
 
 impl Card {
@@ -52,27 +54,15 @@ impl Card {
         }
     }
 
-    fn rarity(&self) -> Option<ERarities> {
-        // This is pretty nasty; we have to wait for a better method.
-        ERarities::from(self.tag_value(EGameTags::Rarity))
-    }
-
     pub fn validate(self) -> Self {
-        // Test enumeration values to not have their respective default keys (= ::Invalid)!
+        // Test enumeration values to not have their respective
+        // default keys (= ::Invalid)!
         if self.kind == ECardTypes::default() {
-            panic!(
-                "card \"{:}\" has default value for `kind`: {:?}",
-                self.id,
-                self.kind
-            );
+            panic!("card \"{:}\" has default value for `kind`: {:?}", self.id, self.kind);
         }
 
         if self.set == ECardSets::default() {
-            panic!(
-                "card \"{:}\" has default value for `set`: {:?}",
-                self.id,
-                self.set
-            );
+            panic!("card \"{:}\" has default value for `set`: {:?}", self.id, self.set);
         }
 
         self
@@ -107,6 +97,7 @@ impl fmt::Display for Card {
     }
 }
 
+
 impl ICard for Card {
     fn id(&self) -> &'static str {
         self.id
@@ -116,70 +107,13 @@ impl ICard for Card {
         self.name
     }
 
-    fn card_type(&self) -> Option<ECardTypes> {
-        ECardTypes::from(self.tag_value(EGameTags::Cardtype))
-
+    fn _get_data_internal(&self) -> &HashMap<EGameTags, u32> {
+        &self.card_data
     }
 
-    fn tag_value(&self, tag: EGameTags) -> u32 {
-        self.card_data.get(&tag) // Get the tag value for key
-            .map(|value| *value) // Deref (through copy) the returned &u32
-            .unwrap_or(0) // Fallback to 0 if None was discovered!
-    }
-
-    fn has_implemented_effects(&self) -> bool {
-        // Implemented if the effects variable contains a container which is
-        // NON-EMPTY!
-        if let Some(ref container) = self.effects {
-            return container.len() > 0;
-        }
-
-        // If effects variable contains None, it's considered implemented!
-        // This might be counter-intuitive, but an empty Vec is used as None variant.
-        // effects: None is explicitly set if the card has no effects.
-        true
-    }
-
+    // +'static -> underlying object is NOT a reference (which
+    // typically has a lower lifetime duration).
     fn effects(&self) -> Option<&Vec<Box<IEffect + 'static>>> {
-        match self.effects {
-            Some(ref expr) => Some(expr),
-            None => None,
-        }
-    }
-
-    fn is_collectible(&self) -> bool {
-        self.tag_value(EGameTags::Collectible) > 0
-    }
-
-    fn card_set(&self) -> Option<ECardSets> {
-        ECardSets::from(self.tag_value(EGameTags::CardSet))
-
-    }
-
-    fn card_class(&self) -> Option<ECardClasses> {
-        ECardClasses::from(self.tag_value(EGameTags::Class))
-    }
-
-    fn has_combo(&self) -> bool {
-        self.tag_value(EGameTags::Combo) > 0
-    }
-
-    fn card_cost(&self) -> u32 {
-        self.tag_value(EGameTags::Cost)
-    }
-
-    fn has_overload(&self) -> bool {
-        self.tag_value(EGameTags::Overload) > 0
-    }
-
-    fn overload(&self) -> u32 {
-        self.tag_value(EGameTags::OverloadOwed)
-    }
-
-    fn max_allowed_in_deck(&self) -> u32 {
-        match self.rarity() {
-            Some(ERarities::Legendary) => 1,
-            _ => 2,
-        }
+        self.effects.as_ref()
     }
 }

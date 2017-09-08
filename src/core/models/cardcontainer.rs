@@ -1,11 +1,11 @@
-
 use std::collections::HashMap;
+use std::fmt;
 
 use contracts::models::{ICard, ICardContainer};
-use core::cardsets;
 use core::Card;
+use core::cardsets;
 
-use enums::{ECardSets, ECardClasses, ECardTypes, EGameTags};
+use enums::{ECardClasses, ECardSets, ECardTypes};
 
 pub const STANDARD_SET: [ECardSets; 7] = [
     ECardSets::Core,
@@ -39,19 +39,19 @@ lazy_static! {
     pub static ref CARDS: CardContainer = CardContainer::new();
 
     // Card used to derive Game entities!
-    pub static ref GAME_CARD: Card = card! {
+    pub static ref GAME_CARD: Card = card! {// @NO-VALIDATE
         id: "GAME",
         name: "Game",
         kind: ECardTypes::Game,
-        set: ECardSets::NoSet
+        set: ECardSets::TestTemporary // TODO; Change this to no-set after macro update!
     };
 
     // Card used to derive Controller entities!
-    pub static ref CONTROLLER_CARD: Card = card! {
+    pub static ref CONTROLLER_CARD: Card = card! {// @NO-VALIDATE
         id: "PLAYER",
         name: "Player",
         kind: ECardTypes::Player,
-        set: ECardSets::NoSet
+        set: ECardSets::TestTemporary // TODO; Change this to no-set after macro update!
     };
 }
 
@@ -64,6 +64,12 @@ pub struct CardContainer {
 
     all_collectible_standard_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>,
     all_collectible_wild_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>,
+}
+
+impl fmt::Display for CardContainer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "CONTAINER [TODO]")
+    }
 }
 
 impl CardContainer {
@@ -84,11 +90,12 @@ impl CardContainer {
     fn collect_cards(self) -> Self {
         let mut card_data = HashMap::new();
 
-        /* PROVISION ALL CARD SETS HERE */
+        // PROVISION ALL CARD SETS HERE
 
         // Test set
         for (key, value) in cardsets::testset::FULL_SET.iter() {
-            // Only this line needs to be adjusted if a different return type for
+            // Only this line needs to be adjusted if a different
+            // return type for
             // Card is necessary!
             card_data.insert(*key, *value as &ICard);
         }
@@ -108,13 +115,13 @@ impl CardContainer {
         self.all_cards = Some(all_cards);
 
         let collectible_standard = collectible.iter()
-                                    .filter(|v| STANDARD_SET.contains(&v.card_set().unwrap()))
+                                    .filter(|v| STANDARD_SET.contains(&v.card_set().expect("Card without set")))
                                     .map(|&v| v) // Deref reference from iterator.
                                     .collect::<Vec<_>>();
         self.all_collectible_standard = Some(collectible_standard);
 
         let collectible_wild = collectible.iter()
-                                .filter(|v| WILD_SET.contains(&v.card_set().unwrap()))
+                                .filter(|v| WILD_SET.contains(&v.card_set().expect("Card without set")))
                                 .map(|&v| v) // Deref reference from iterator.
                                 .collect::<Vec<_>>();
         self.all_collectible_wild = Some(collectible_wild);
@@ -135,6 +142,7 @@ impl ICardContainer for CardContainer {
     fn all_wild(&self) -> &Vec<&'static ICard> {
         self.all_collectible_wild.as_ref().unwrap()
     }
+
     fn all_standard(&self) -> &Vec<&'static ICard> {
         self.all_collectible_standard.as_ref().unwrap()
     }
@@ -142,6 +150,7 @@ impl ICardContainer for CardContainer {
     fn wild(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>> {
         self.all_collectible_wild_per_class.as_ref().unwrap()
     }
+
     fn standard(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>> {
         self.all_collectible_standard_per_class.as_ref().unwrap()
     }
@@ -152,6 +161,7 @@ impl ICardContainer for CardContainer {
             None => None,
         }
     }
+
     fn from_name(&self, name: &str) -> Option<&'static ICard> {
         self.all_cards.as_ref().unwrap()
                 .iter()
@@ -166,6 +176,21 @@ impl ICardContainer for CardContainer {
             .iter()
             .filter(|&(_, v)| match v.card_type() {
                 Some(t) => t == ECardTypes::Hero,
+                None => false,
+            })
+            .filter(|&(_, v)| match v.card_class() {
+                Some(c) => c == class,
+                None => false,
+            })
+            .map(|(_, &v)| v) // Take only the reference to the card.
+            .collect::<Vec<_>>()
+    }
+
+    fn hero_power_cards(&self, class: ECardClasses) -> Vec<&'static ICard> {
+        self.all_cards.as_ref().unwrap()
+            .iter()
+            .filter(|&(_,v)| match v.card_type() {
+                Some(t) => t == ECardTypes::HeroPower,
                 None => false,
             })
             .filter(|&(_, v)| match v.card_class() {

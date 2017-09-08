@@ -1,4 +1,9 @@
-// #[macro_export] -> Uncomment when this macro is needed in other crates.
+// TODO; Needs a way to pass switches into macro's
+// example is disabling validation; card!{@NO-VALIDAT id:""
+// ,...}
+
+// #[macro_export] -> Uncomment when this macro is needed
+// in other crates.
 macro_rules! card {
     // This match rule is used to be robust about trailing comma's, since the last field COULD have
     // a trailing comma.

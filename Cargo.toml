@@ -9,3 +9,6 @@ maplit = "0.1.4"
 # Allows dynamic allocations (hashmap and others) within static
 # variables through lazy evaluation.
 lazy_static = "0.2"
+# Allows conversion of primitives TO/FROM enum values
+enum-primitive-derive = "^0.1"
+num-traits = "^0.1"

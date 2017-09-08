@@ -1,8 +1,7 @@
-use std::fmt::{Debug,Display};
+use std::fmt::{Debug, Display};
 
 // TODO
 pub trait SharedState: Debug + Display {
-
     fn playables(&self) -> i32;
 
     fn card_ids(&self) -> i32;
