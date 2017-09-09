@@ -24,7 +24,7 @@ pub struct Card {
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
     pub reference_tags: Option<HashMap<EGameTags, u32>>,
     pub effects: Option<Vec<Box<IEffect + 'static>>>,
-    pub card_data: HashMap<EGameTags, u32>,
+    pub card_data: HashMap<EGameTags, u32>
 }
 
 // Force implement the Sync trait since we guarantee
@@ -92,7 +92,10 @@ impl Card {
 }
 
 impl fmt::Display for Card {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> Result<(), fmt::Error> {
         write!(f, "CARD [TODO]")
     }
 }

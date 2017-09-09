@@ -1,16 +1,16 @@
 use std::fmt::{Debug, Display};
 
-use contracts::state_machine::{Method, SharedState};
-use enums::EExecutionStates;
+use contracts::state_machine::IMethod;
+use enums::contracted::EExecutionStates;
 
-pub trait Program: Debug + Display {
-    fn shared_state(&self) -> &SharedState;
-    fn method_list(&self) -> &i32;
-
+pub trait IProgram: Debug + Display {
     /// Process the next queued method.
     fn process_next(&mut self) -> EExecutionStates;
 
     /// Instantly execute the provided method within this
     /// program.
-    fn fast_execute(&self, &mut Method) -> EExecutionStates;
+    fn fast_execute(
+        &self,
+        method: Box<IMethod>,
+    ) -> EExecutionStates;
 }

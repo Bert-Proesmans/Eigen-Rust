@@ -6,7 +6,7 @@ pub enum ERarities {
     Rare = 3,
     Epic = 4,
     Legendary = 5,
-    Unknown6 = 6,
+    Unknown6 = 6
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
@@ -23,7 +23,7 @@ pub enum ECardClasses {
     Warlock = 9,
     Warrior = 10,
     Dream = 11,
-    Neutral = 12,
+    Neutral = 12
 }
 
 #[derive(Debug, Primitive)]
@@ -52,7 +52,7 @@ pub enum ERace {
     Totem = 21,
     Nerubian = 22,
     Pirate = 23,
-    Dragon = 24,
+    Dragon = 24
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
@@ -70,7 +70,7 @@ pub enum ECardTypes {
     Item = 8,
     // TODO. check if this is still used!
     Token = 9,
-    HeroPower = 10,
+    HeroPower = 10
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
@@ -103,5 +103,5 @@ pub enum ECardSets {
     Gangs = 25,
     GangsReserve = 26,
     Ungoro = 27,
-    Icecrown = 1001,
+    Icecrown = 1001
 }

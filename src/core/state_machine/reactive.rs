@@ -7,11 +7,14 @@ pub struct Dispatcher<T>
 where
     T: Observer,
 {
-    observers: Vec<Weak<T>>,
+    observers: Vec<Weak<T>>
 }
 
 pub trait Observer {
-    fn on_update(&self, event: &EEvents);
+    fn on_update(
+        &self,
+        event: &EEvents,
+    );
 }
 
 pub trait Observable<T>
@@ -22,14 +25,20 @@ where
     // runtime panics heavily.
     // If mutability is required, we opt for INTERIOUR
     // mutability.
-    fn register_observer(&mut self, observer: Rc<T>);
+    fn register_observer(
+        &mut self,
+        observer: Rc<T>,
+    );
 }
 
 impl<T> Observable<T> for Dispatcher<T>
 where
     T: Observer,
 {
-    fn register_observer(&mut self, observer: Rc<T>) {
+    fn register_observer(
+        &mut self,
+        observer: Rc<T>,
+    ) {
         self.observers.push(Rc::downgrade(&observer));
     }
 }
@@ -46,7 +55,10 @@ where
         self.observers.len()
     }
 
-    pub fn dispatch(&mut self, event: EEvents) {
+    pub fn dispatch(
+        &mut self,
+        event: EEvents,
+    ) {
         let mut cleanup = false;
 
         for observer_weak in self.observers.iter() {

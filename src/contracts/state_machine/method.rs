@@ -1,6 +1,8 @@
 use std::fmt::{Debug, Display};
 
-use enums::EExecutionStates;
+use contracts::state_machine::ISharedState;
+
+use enums::contracted::EExecutionStates;
 
 /// Comparable to anonymous functions. These instances can
 /// be invoked
@@ -11,9 +13,12 @@ use enums::EExecutionStates;
 /// information within the shared state, which is held by
 /// the game
 /// instance.
-pub trait Method: Debug + Display {
+pub trait IMethod: Debug + Display {
     /// Gets the state value of this instance.
     fn state(&self) -> EExecutionStates;
     /// Run the embedded code of this method.
-    fn run(&self) -> EExecutionStates;
+    fn run(
+        &mut self,
+        state: &mut ISharedState,
+    ) -> EExecutionStates;
 }

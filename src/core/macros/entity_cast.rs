@@ -35,8 +35,6 @@ macro_rules! cast_entity_mut {
             }
         );
 
-        // _any_type.DoFunc();
-
         Ok(_any_type.downcast_mut::<$target_type>().expect("Downcasting IEntity faild"))
     }
     };

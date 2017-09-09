@@ -1,15 +1,16 @@
 use std::any::Any;
 use std::borrow::{Borrow, BorrowMut};
-use std::cell::Cell;
 use std::collections::HashMap;
 use std::fmt;
 
-use contracts::models::{ICard, ICardContainer, IEntity, IEntityCastable, IEntityData, IEntityInitializable};
+use contracts::models::{ICard, ICardContainer, ICharacter, IEntity, IEntityCastable, IEntityData,
+                        IEntityInitializable, IPlayable};
 
 use core::{Controller, GameConfig};
 use core::models::cardcontainer::{CARDS, GAME_CARD};
 use core::models::entities::{EntityData, Hero, HeroPower};
 use core::models::gameconfig::MAX_PLAYERS;
+use core::state_machine::Program;
 
 use enums::{EGameTags, EZones};
 use enums::contracted::EntityCreationError;
@@ -20,24 +21,28 @@ use enums::internal::errors::GameCreationError;
 const GAME_ENTITY_ID: u32 = 1;
 
 #[derive(Debug)]
-pub struct Game {
+pub struct Game<'game> {
     data: EntityData,
     card: &'static ICard,
     config: GameConfig,
+    simulator: Program<'game>,
 
-    entities: HashMap<u32, Box<IEntity>>, // All entities except the game itself
+    entities: HashMap<u32, Box<IEntity<'game>>>, // All entities except the game itself
 
     next_eid: u32,
-    next_oop: u32,
+    next_oop: u32
 }
 
-impl<'a> fmt::Display for Game {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+impl<'game> fmt::Display for Game<'game> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> Result<(), fmt::Error> {
         write!(f, "GAME [TODO]")
     }
 }
 
-impl IEntity for Game {
+impl<'e> IEntity<'e> for Game<'e> {
     fn reference_card(&self) -> &'static ICard {
         self.card
     }
@@ -46,7 +51,10 @@ impl IEntity for Game {
         &self.data
     }
 
-    fn tag_value(&self, tag: EGameTags) -> u32 {
+    fn tag_value(
+        &'e self,
+        tag: EGameTags,
+    ) -> u32 {
         let tag_value = self.native_tag_value(tag); // MUT
         // TODO; process all aura's and other stuff which influence
         // this tag.
@@ -54,29 +62,45 @@ impl IEntity for Game {
         tag_value
     }
 
-    fn as_any(&self) -> &Any {
-        panic!("Game struct does NOT support downcasting from the IEntity trait object");
+    fn as_any(&'e self) -> &'e Any {
+        self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        panic!("Game struct does NOT support downcasting from the IEntity trait object");
+    fn as_playable(&'e self) -> Option<&'e IPlayable> {
+        None
+    }
+
+    fn as_character(&'e self) -> Option<&'e ICharacter> {
+        None
+    }
+
+    fn as_any_mut(&'e mut self) -> &'e mut Any {
+        self
+    }
+
+    fn as_playable_mut(&'e mut self) -> Option<&'e mut IPlayable> {
+        None
+    }
+
+    fn as_character_mut(&'e mut self) -> Option<&'e mut ICharacter> {
+        None
     }
 }
 
-impl Game {
-    fn next_eid(&mut self) -> u32 {
+impl<'game> Game<'game> {
+    fn next_eid(&'game mut self) -> u32 {
         let val = self.next_eid;
         self.next_eid += 1;
         val
     }
 
-    pub fn next_oop(&mut self) -> u32 {
+    pub fn next_oop(&'game mut self) -> u32 {
         let val = self.next_oop;
         self.next_oop += 1;
         val
     }
 
-    pub fn new(config: GameConfig) -> Result<Self, GameCreationError> {
+    pub fn new(config: GameConfig) -> Result<Game<'game>, GameCreationError> {
         // Test configuration
         let validated_config = try!(config.validate().map_err(|x| GameCreationError::InvalidConfig(x)));
 
@@ -89,6 +113,8 @@ impl Game {
         game_entity_data.set_tag(EGameTags::Zone, EZones::Play as u32);
 
 
+        let simulator = Program::new();
+
         let next_eid = GAME_ENTITY_ID + 1;
         let next_oop = 1;
 
@@ -96,11 +122,12 @@ impl Game {
             data: game_entity_data,
             card: &*GAME_CARD,
             config: validated_config,
+            simulator: simulator,
 
             next_eid: next_eid,
             next_oop: next_oop,
 
-            entities: hashmap!{},
+            entities: hashmap!{}
         };
 
         let obj = try!(obj.build_controllers());
@@ -176,11 +203,11 @@ impl Game {
     }
 
     pub fn init_entity<T: IEntityInitializable + IEntityCastable>(
-        &mut self,
+        &'game mut self,
         card: &'static ICard,
-    ) -> Result<&mut T, EntityCreationError> {
+    ) -> Result<&'game mut T, EntityCreationError> {
         let entity_id = self.next_eid();
-        let entity = try!(T::new(entity_id, card));
+        let entity = try!(T::new(entity_id, card)) as Box<IEntity + 'game>;
         // Consume id and entity object.
         self.entities.insert(entity_id, entity);
 
@@ -189,16 +216,22 @@ impl Game {
         Ok(t_ref)
     }
 
-    pub fn get_entity<'a>(&'a self, entity_id: u32) -> Option<&'a IEntity> {
+    pub fn get_entity(
+        &self,
+        entity_id: u32,
+    ) -> Option<&IEntity> {
         self.entities.get(&entity_id).map(|box_ref| box_ref.borrow())
     }
 
-    pub fn get_entity_mut<'a>(&'a mut self, entity_id: u32) -> Option<&'a mut IEntity> {
+    pub fn get_entity_mut(
+        &mut self,
+        entity_id: u32,
+    ) -> Option<&mut IEntity> {
         let val = match self.entities.get_mut(&entity_id) {
             Some(entity) => {
                 let z: &mut IEntity = entity.borrow_mut();
                 return Some(z);
-            },
+            }
             None => None,
         };
         val

@@ -13,9 +13,21 @@ pub trait ICardContainer: Debug + Display + Sync {
     fn wild(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>>;
     fn standard(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>>;
 
-    fn from_id(&self, id: &str) -> Option<&'static ICard>;
-    fn from_name(&self, name: &str) -> Option<&'static ICard>;
+    fn from_id(
+        &self,
+        id: &str,
+    ) -> Option<&'static ICard>;
+    fn from_name(
+        &self,
+        name: &str,
+    ) -> Option<&'static ICard>;
 
-    fn hero_cards(&self, class: ECardClasses) -> Vec<&'static ICard>;
-    fn hero_power_cards(&self, class: ECardClasses) -> Vec<&'static ICard>;
+    fn hero_cards(
+        &self,
+        class: ECardClasses,
+    ) -> Vec<&'static ICard>;
+    fn hero_power_cards(
+        &self,
+        class: ECardClasses,
+    ) -> Vec<&'static ICard>;
 }

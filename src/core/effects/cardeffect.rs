@@ -6,7 +6,10 @@ use contracts::effects::IEffect;
 pub struct CardEffect {}
 
 impl fmt::Display for CardEffect {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> Result<(), fmt::Error> {
         write!(f, "EFFECT [TODO]")
     }
 }

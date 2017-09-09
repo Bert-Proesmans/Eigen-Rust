@@ -1,7 +1,7 @@
 use std::any::Any;
 use std::fmt;
 
-use contracts::models::{ICard, IEntity, IEntityCastable, IEntityData, IEntityInitializable};
+use contracts::models::{ICard, ICharacter, IEntity, IEntityCastable, IEntityData, IEntityInitializable, IPlayable};
 
 use core::models::entities::{Controller, EntityData};
 
@@ -11,11 +11,14 @@ use enums::contracted::{EntityCastError, EntityCreationError};
 #[derive(Debug)]
 pub struct Weapon {
     data: EntityData,
-    card: &'static ICard,
+    card: &'static ICard
 }
 
 impl fmt::Display for Weapon {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> Result<(), fmt::Error> {
         write!(f, "WEAPON [TODO]")
     }
 }
@@ -24,7 +27,7 @@ impl Weapon {
     // add code here
 }
 
-impl IEntity for Weapon {
+impl<'e> IEntity<'e> for Weapon {
     fn reference_card(&self) -> &'static ICard {
         self.card
     }
@@ -33,7 +36,10 @@ impl IEntity for Weapon {
         &self.data
     }
 
-    fn tag_value(&self, tag: EGameTags) -> u32 {
+    fn tag_value(
+        &self,
+        tag: EGameTags,
+    ) -> u32 {
         let mut tag_value = self.native_tag_value(tag);
         // TODO; process all aura's and other stuff which influence
         // this tag.
@@ -41,24 +47,43 @@ impl IEntity for Weapon {
         tag_value
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&'e self) -> &'e Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_playable(&'e self) -> Option<&'e IPlayable> {
+        Some(self)
+    }
+
+    fn as_character(&'e self) -> Option<&'e ICharacter> {
+        None
+    }
+
+    fn as_any_mut(&'e mut self) -> &'e mut Any {
         self
+    }
+
+    fn as_playable_mut(&'e mut self) -> Option<&'e mut IPlayable> {
+        Some(self)
+    }
+
+    fn as_character_mut(&'e mut self) -> Option<&'e mut ICharacter> {
+        None
     }
 }
 
 impl IEntityInitializable for Weapon {
-    fn new(entity_id: u32, card: &'static ICard) -> Result<Box<IEntity>, EntityCreationError> {
+    fn new(
+        entity_id: u32,
+        card: &'static ICard,
+    ) -> Result<Box<IEntity>, EntityCreationError> {
         let entity_data = try!(EntityData::from_data(entity_id, card._get_data_internal()).map_err(|x| {
             EntityCreationError::InvalidEntityData(x)
         }));
 
         let obj = Self {
             data: entity_data,
-            card: card,
+            card: card
         };
 
         // Box the object and return it to caller.
@@ -67,11 +92,17 @@ impl IEntityInitializable for Weapon {
 }
 
 impl IEntityCastable for Weapon {
-    fn try_into<'a>(e: &'a IEntity) -> Result<&'a Self, EntityCastError> {
-        cast_entity!(e, (ECardTypes::Weapon), Weapon)
+    fn try_into<'e>(e: &'e IEntity) -> Result<&'e Self, EntityCastError> {
+        // cast_entity!(e, (ECardTypes::Weapon), Weapon)
+        Err(EntityCastError::NoCastProvided)
     }
 
-    fn try_into_mut<'a>(e: &'a mut IEntity) -> Result<&'a mut Self, EntityCastError> {
-        cast_entity_mut!(e, (ECardTypes::Weapon), Weapon)
+    fn try_into_mut<'e>(e: &'e mut IEntity) -> Result<&'e mut Self, EntityCastError> {
+        // cast_entity_mut!(e, (ECardTypes::Weapon), Weapon)
+        Err(EntityCastError::NoCastProvided)
     }
+}
+
+impl IPlayable for Weapon {
+    // add code here
 }

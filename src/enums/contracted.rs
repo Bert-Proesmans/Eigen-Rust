@@ -2,13 +2,13 @@ use enums::ECardTypes;
 
 #[derive(Debug)]
 pub enum EntityDataCreationError {
-    InvalidEntityID { provided: u32, requested: u32 },
+    InvalidEntityID { provided: u32, requested: u32 }
 }
 
 #[derive(Debug)]
 pub enum EntityCreationError {
     InvalidEntityData(EntityDataCreationError),
-    InvalidCast(EntityCastError),
+    InvalidCast(EntityCastError)
 }
 
 #[derive(Debug)]
@@ -17,6 +17,15 @@ pub enum EntityCastError {
     ErasedType,
     NonMatchingType {
         found: ECardTypes,
-        expected: ECardTypes,
-    },
+        expected: ECardTypes
+    }
+}
+
+#[derive(Debug)]
+pub enum EExecutionStates {
+    Invalid = 0,
+    Ready = 1,
+    Running = 2,
+    Finished = 3,
+    Abort = 4
 }

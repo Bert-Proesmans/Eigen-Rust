@@ -7,32 +7,28 @@ use core::cardsets;
 
 use enums::{ECardClasses, ECardSets, ECardTypes};
 
-pub const STANDARD_SET: [ECardSets; 7] = [
-    ECardSets::Core,
-    ECardSets::Expert1,
-    ECardSets::Og,
-    ECardSets::Kara,
-    ECardSets::Gangs,
-    ECardSets::Ungoro,
-    ECardSets::Icecrown,
-];
+pub const STANDARD_SET: [ECardSets; 7] = [ECardSets::Core,
+                                          ECardSets::Expert1,
+                                          ECardSets::Og,
+                                          ECardSets::Kara,
+                                          ECardSets::Gangs,
+                                          ECardSets::Ungoro,
+                                          ECardSets::Icecrown];
 
-pub const WILD_SET: [ECardSets; 13] = [
-    ECardSets::Core,
-    ECardSets::Expert1,
-    ECardSets::Og,
-    ECardSets::Kara,
-    ECardSets::Gangs,
-    ECardSets::Ungoro,
-    ECardSets::Icecrown,
-    // END STANDARD
-    ECardSets::Brm,
-    ECardSets::Gvg,
-    ECardSets::Hof,
-    ECardSets::Naxx,
-    ECardSets::Loe,
-    ECardSets::Tgt,
-];
+pub const WILD_SET: [ECardSets; 13] = [ECardSets::Core,
+                                       ECardSets::Expert1,
+                                       ECardSets::Og,
+                                       ECardSets::Kara,
+                                       ECardSets::Gangs,
+                                       ECardSets::Ungoro,
+                                       ECardSets::Icecrown,
+                                       // END STANDARD
+                                       ECardSets::Brm,
+                                       ECardSets::Gvg,
+                                       ECardSets::Hof,
+                                       ECardSets::Naxx,
+                                       ECardSets::Loe,
+                                       ECardSets::Tgt];
 
 lazy_static! {
     // The ONE container for all cards!
@@ -63,11 +59,14 @@ pub struct CardContainer {
     all_collectible_wild: Option<Vec<&'static ICard>>,
 
     all_collectible_standard_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>,
-    all_collectible_wild_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>,
+    all_collectible_wild_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>
 }
 
 impl fmt::Display for CardContainer {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> Result<(), fmt::Error> {
         write!(f, "CONTAINER [TODO]")
     }
 }
@@ -80,7 +79,7 @@ impl CardContainer {
             all_collectible_standard: None,
             all_collectible_wild: None,
             all_collectible_standard_per_class: None,
-            all_collectible_wild_per_class: None,
+            all_collectible_wild_per_class: None
         };
 
         // Fill all container fields.
@@ -103,7 +102,10 @@ impl CardContainer {
         self.construct_collections(card_data)
     }
 
-    fn construct_collections(mut self, all_cards: HashMap<&'static str, &'static ICard>) -> Self {
+    fn construct_collections(
+        mut self,
+        all_cards: HashMap<&'static str, &'static ICard>,
+    ) -> Self {
         // Create collections for each format.
 
         let collectible = all_cards.iter()
@@ -155,14 +157,20 @@ impl ICardContainer for CardContainer {
         self.all_collectible_standard_per_class.as_ref().unwrap()
     }
 
-    fn from_id(&self, id: &str) -> Option<&'static ICard> {
+    fn from_id(
+        &self,
+        id: &str,
+    ) -> Option<&'static ICard> {
         match self.all_cards.as_ref().unwrap().get(id) {
             Some(&item) => Some(item),
             None => None,
         }
     }
 
-    fn from_name(&self, name: &str) -> Option<&'static ICard> {
+    fn from_name(
+        &self,
+        name: &str,
+    ) -> Option<&'static ICard> {
         self.all_cards.as_ref().unwrap()
                 .iter()
                 .filter(|&(_,v)| v.name().starts_with(name))
@@ -171,7 +179,10 @@ impl ICardContainer for CardContainer {
                 .next()
     }
 
-    fn hero_cards(&self, class: ECardClasses) -> Vec<&'static ICard> {
+    fn hero_cards(
+        &self,
+        class: ECardClasses,
+    ) -> Vec<&'static ICard> {
         self.all_cards.as_ref().unwrap()
             .iter()
             .filter(|&(_, v)| match v.card_type() {
@@ -186,7 +197,10 @@ impl ICardContainer for CardContainer {
             .collect::<Vec<_>>()
     }
 
-    fn hero_power_cards(&self, class: ECardClasses) -> Vec<&'static ICard> {
+    fn hero_power_cards(
+        &self,
+        class: ECardClasses,
+    ) -> Vec<&'static ICard> {
         self.all_cards.as_ref().unwrap()
             .iter()
             .filter(|&(_,v)| match v.card_type() {

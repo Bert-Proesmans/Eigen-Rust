@@ -31,7 +31,7 @@ pub struct GameConfig {
     pub build_hero_powers: bool,
 
     pub max_minions_on_board: usize,
-    pub max_entities_in_deck: usize,
+    pub max_entities_in_deck: usize
 }
 
 impl GameConfig {

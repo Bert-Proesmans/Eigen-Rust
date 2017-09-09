@@ -82,13 +82,13 @@ pub enum EGameSteps {
 
     /// <summary>The step which marks the end of the
     /// game.</summary>
-    FinalGameover,
+    FinalGameover
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum EFormats {
     Wild,
-    Standard,
+    Standard
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
@@ -100,7 +100,7 @@ pub enum EZones {
     Graveyard = 4,
     Removedfromgame = 5,
     Setaside = 6,
-    Secret = 7,
+    Secret = 7
 }
 
 // TODO; Remove integers
@@ -176,7 +176,7 @@ pub enum EPlayRequirements {
     ReqNotDisabledHeroPower = 68,
     ReqMustPlayOtherCardFirst = 69,
     ReqHandNotFull = 70,
-    ReqDragToPlay = 71,
+    ReqDragToPlay = 71
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
@@ -521,5 +521,5 @@ pub enum EGameTags {
     NumElementalPlayedThisTurn = 1006,
     NumElementalPlayedLastTurn = 1007,
     NumMurlocsPlayedThisGame = 1008,
-    TagLastKnownPositionOnBoard = 1009, // position aren't changed in graveyard and setaside zone ??? obolet?
+    TagLastKnownPositionOnBoard = 1009 // position aren't changed in graveyard and setaside zone ??? obolet?
 }

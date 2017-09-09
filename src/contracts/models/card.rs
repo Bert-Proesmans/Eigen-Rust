@@ -31,7 +31,10 @@ pub trait ICard: Debug + Display + Sync {
         true
     }
 
-    fn tag_value(&self, tag: EGameTags) -> u32 {
+    fn tag_value(
+        &self,
+        tag: EGameTags,
+    ) -> u32 {
         self._get_data_internal()
                     .get(&tag)
                     // Deref primitive value if existing.
