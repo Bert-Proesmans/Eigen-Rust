@@ -28,11 +28,14 @@ control_style = "Rfc"
 where_style = "Rfc"
 
 chain_split_single_child = false
-match_block_trailing_comma = true
+match_block_trailing_comma = false
+trailing_comma = "Never"
 
-fn_return_indent = "WithWhereClause"
-array_layout = "Block"
+
+array_layout = "Visual"
 chain_indent = "Visual"
 struct_lit_style = "Block"
+fn_return_indent = "WithWhereClause"
+fn_args_density = "Vertical"
 multiline_closure_forces_block = true
 multiline_match_arm_forces_block = true
