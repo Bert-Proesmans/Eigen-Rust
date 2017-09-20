@@ -6,7 +6,13 @@
 // unstable_features,
 // unused_import_braces, unused_qualifications)]
 
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
+
+
+// `error_chain!` can recurse deeply
+#![recursion_limit = "1024"]
+#[macro_use]
+extern crate error_chain;
 
 #[macro_use]
 extern crate maplit;
@@ -15,10 +21,39 @@ extern crate lazy_static;
 #[macro_use]
 extern crate enum_primitive_derive;
 extern crate num_traits;
+#[macro_use]
+pub extern crate slog;
+extern crate slog_stdlog;
+extern crate chrono;
 
-pub mod contracts;
+#[macro_use]
+mod macros;
 pub mod enums;
-pub mod core;
+mod errors;
+mod game_manager;
+
+mod cards;
+mod contracts;
+mod game;
+mod state_machine;
+
+pub mod prelude {
+    // This module will re-export all important types and
+    // traits.
+
+    // All contracts are put in the prelude to be able to use
+    // their defined
+    // methods everywhere.
+
+    pub use contracts::*;
+
+    pub use game::config::GameConfig;
+    pub use game_manager::GameManager;
+
+    pub use cards::card_container::CARDS;
+
+    pub use errors::*;
+}
 
 
 #[cfg(test)]

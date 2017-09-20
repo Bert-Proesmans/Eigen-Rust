@@ -1,5 +1,7 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum EGameSteps {
+    PreGame,
+
     /// <summary>The entry point (first executed step) of
     /// the simulated game.</summary>
     OpeningStart,
@@ -82,7 +84,7 @@ pub enum EGameSteps {
 
     /// <summary>The step which marks the end of the
     /// game.</summary>
-    FinalGameover
+    FinalGameOver
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -103,8 +105,7 @@ pub enum EZones {
     Secret = 7
 }
 
-// TODO; Remove integers
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Primitive)]
 pub enum EPlayRequirements {
     ReqMinionTarget = 1,
     ReqFriendlyTarget = 2,

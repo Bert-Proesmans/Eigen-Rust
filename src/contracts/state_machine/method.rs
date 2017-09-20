@@ -1,8 +1,8 @@
 use std::fmt::{Debug, Display};
 
-use contracts::state_machine::ISharedState;
+use contracts::state_machine::program::IProgram;
 
-use enums::contracted::EExecutionStates;
+use enums::EExecutionStates;
 
 /// Comparable to anonymous functions. These instances can
 /// be invoked
@@ -19,6 +19,6 @@ pub trait IMethod: Debug + Display {
     /// Run the embedded code of this method.
     fn run(
         &mut self,
-        state: &mut ISharedState,
+        state: &mut IProgram,
     ) -> EExecutionStates;
 }
