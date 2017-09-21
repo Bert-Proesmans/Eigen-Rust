@@ -7,9 +7,9 @@ use contracts::state_machine::shared_state::ISharedState;
 use enums::{EExecutionStates, EGameSteps};
 
 pub trait IProgram<'a>: Debug + Display {
-    fn all_entities(&self) -> Box<Iterator<Item = &'a IEntity>>;
+    fn all_entities(&'a self) -> Box<Iterator<Item = &'a IEntity> + 'a>;
 
-    fn shared_state_mut(&mut self) -> &'a mut ISharedState;
+    fn shared_state_mut(&'a mut self) -> &'a mut ISharedState;
 
     /// Process the next queued method.
     fn process_next(&mut self) -> EExecutionStates;

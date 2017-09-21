@@ -239,7 +239,7 @@ impl<'a> GameManager<'a> {
 }
 
 impl<'a> IProgram<'a> for GameManager<'a> {
-    fn all_entities(&self) -> Box<Iterator<Item = &'a IEntity>> {
+    fn all_entities(&'a self) -> Box<Iterator<Item = &'a IEntity> + 'a> {
         // Nightly supports -> impl Iterator<Item....>
         // instead of ->Box<Iterator<Item..>>
         let it = self.entities.iter()
@@ -249,7 +249,7 @@ impl<'a> IProgram<'a> for GameManager<'a> {
         Box::new(it)
     }
 
-    fn shared_state_mut(&mut self) -> &'a mut ISharedState {
+    fn shared_state_mut(&'a mut self) -> &'a mut ISharedState {
         &mut self.shared_state
     }
 
