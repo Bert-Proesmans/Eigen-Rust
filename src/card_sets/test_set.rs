@@ -1,7 +1,13 @@
 use std::collections::HashMap;
 
-// TODO; Rework the set implementation when compiler plugins are stable.
-// We can use crate rust_phf for compile time hashmap generation.
+use cards::card::Card;
+
+use enums::{ECardSets, ECardTypes, EGameTags};
+
+// TODO; Rework the set implementation when compiler
+// plugins are stable.
+// We can use crate rust_phf for compile time hashmap
+// generation.
 
 // All card implementations MUST be implemented between the
 // lazy_static! tags.
@@ -48,6 +54,7 @@ lazy_static! {
 mod tests {
 
     use super::*;
+    use cards::card_container::CARDS;
 
     #[test]
     fn load_cardset() {
@@ -58,17 +65,15 @@ mod tests {
 
     #[test]
     fn load_container() {
-       let ref container = *cardcontainer::CARDS;
-       println!("{:?}", container);
-       println!("-----------");
+        let ref container = *CARDS;
+        println!("{:?}", container);
+        println!("-----------");
     }
 
     #[test]
     fn load_test_card() {
-       let ref container = *cardcontainer::CARDS;
-       let test_card = container.from_id("EX1_323h").expect(
-        "Card EX1_323h not found!",
-        );
+        let ref container = *cardcontainer::CARDS;
+        let test_card = container.from_id("EX1_323h").expect("Card EX1_323h not found!");
 
         println!("test-card: {:?}", test_card);
         println!("-----------");

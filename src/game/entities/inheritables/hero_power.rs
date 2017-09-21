@@ -3,9 +3,14 @@ use std::fmt;
 
 use contracts::cards::card::ICard;
 use contracts::entities::character::ICharacter;
-use contracts::entities::entity::{IEntity, IEntityCastable, IEntityInitializable};
+use contracts::entities::entity::IEntity;
+use contracts::entities::entity_castable::IEntityCastable;
 use contracts::entities::entity_data::IEntityData;
+use contracts::entities::entity_initializable::IEntityInitializable;
 use contracts::entities::playable::IPlayable;
+
+use contracts::entities::entity_castable::errors as CastError;
+use contracts::entities::errors as EntityError;
 
 use game::entities::controller::Controller;
 use game::entities::entity_data::EntityData;
@@ -14,7 +19,6 @@ use game::entities::inheritables::weapon::Weapon;
 use game_manager::GameManager;
 
 use enums::{ECardTypes, EGameTags};
-use errors::{EntityCastError, EntityCreationError};
 
 #[derive(Debug)]
 pub struct HeroPower {
@@ -26,7 +30,7 @@ impl fmt::Display for HeroPower {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
-    ) -> Result<(), fmt::Error> {
+    ) -> fmt::Result {
         write!(f, "HERO_POWER [TODO]")
     }
 }
@@ -42,6 +46,10 @@ impl IEntity for HeroPower {
 
     fn _get_data_internal(&self) -> &IEntityData {
         &self.data
+    }
+
+    fn _get_data_internal_mut(&mut self) -> &mut IEntityData {
+        &mut self.data
     }
 
     fn tag_value(
@@ -84,8 +92,9 @@ impl IEntityInitializable for HeroPower {
     fn new(
         entity_id: u32,
         card: &'static ICard,
-    ) -> Result<Box<IEntity>, EntityCreationError> {
-        let entity_data: Result<_> = EntityData::from_data(entity_id, card._get_data_internal()).map_err(|e| e.into());
+    ) -> EntityError::Result<Box<IEntity>> {
+        let entity_data: EntityError::Result<_> =
+            EntityData::from_data(entity_id, card._get_data_internal()).map_err(|e| e.into());
         let entity_data = try!(entity_data);
 
         let obj = Self {
@@ -99,14 +108,14 @@ impl IEntityInitializable for HeroPower {
 }
 
 impl IEntityCastable for HeroPower {
-    fn try_into<'e>(e: &'e IEntity) -> Result<&'e Self, EntityCastError> {
+    fn try_into<'e>(_e: &'e IEntity) -> CastError::Result<&'e Self> {
         // cast_entity!(e, (ECardTypes::HeroPower), HeroPower)
-        Err(EntityCastError::NoCastProvided)
+        bail!(CastError::ErrorKind::NoCastProvided);
     }
 
-    fn try_into_mut<'e>(e: &'e mut IEntity) -> Result<&'e mut Self, EntityCastError> {
+    fn try_into_mut<'e>(_e: &'e mut IEntity) -> CastError::Result<&'e mut Self> {
         // cast_entity_mut!(e, (ECardTypes::HeroPower), HeroPower)
-        Err(EntityCastError::NoCastProvided)
+        bail!(CastError::ErrorKind::NoCastProvided);
     }
 }
 

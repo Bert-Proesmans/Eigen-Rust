@@ -6,28 +6,27 @@ use slog;
 use slog::Drain;
 use slog_stdlog;
 
-// use contracts::cards::card::ICard;
-// use contracts::cards::card_container::ICardContainer;
+use contracts::cards::card::ICard;
+use contracts::cards::card_container::ICardContainer;
 
 use contracts::entities::entity::IEntity;
-// use contracts::entities::entity_castable::
-// IEntityCastable;
+use contracts::entities::entity_castable::IEntityCastable;
 
 use contracts::entities::entity_initializable::IEntityInitializable;
 use contracts::state_machine::method::IMethod;
 use contracts::state_machine::program::IProgram;
 use contracts::state_machine::shared_state::ISharedState;
 
-// use contracts::entities::errors as EntityError;
+use contracts::entities::errors as EntityError;
 
-// use cards::card_container::CARDS;
+use cards::card_container::CARDS;
 
 use game::config::{GameConfig, MAX_PLAYERS};
-// use game::entities::controller::Controller;
+use game::entities::controller::Controller;
 
 use game::entities::game::Game;
-// use game::entities::inheritables::hero::Hero;
-// use game::entities::inheritables::hero_power::HeroPower;
+use game::entities::inheritables::hero::Hero;
+use game::entities::inheritables::hero_power::HeroPower;
 
 use state_machine::shared_state::SharedState;
 
@@ -42,6 +41,7 @@ pub mod errors {
         links {
             InvalidConfig(::game::errors::Error, ::game::errors::ErrorKind);
             EntityCreationFail(::contracts::entities::errors::Error, ::contracts::entities::errors::ErrorKind);
+            MissingCardData(::contracts::cards::errors::Error,::contracts::cards::errors::ErrorKind);
         }
     }
 }
@@ -106,31 +106,29 @@ impl<'a> GameManager<'a> {
         };
 
 
-        // let obj = try!(obj.build_controllers());
-        // let obj = try!(obj.build_heroes());
-        // let obj = try!(obj.build_hero_powers());
+        let obj = try!(obj.build_controllers());
+        let obj = try!(obj.build_heroes());
+        let obj = try!(obj.build_hero_powers());
 
         Ok(obj)
     }
 
-    // pub fn init_entity<T: IEntityInitializable +
-    // IEntityCastable>(
-    //     &mut self,
-    //     card: &'static ICard,
-    // ) -> EntityError::Result<&mut T> {
-    //     let entity_id = self.next_eid();
-    // let entity = try!(T::new(entity_id, card)) as
-    // Box<IEntity>;
-    //     // Consume id and entity object.
-    //     self.entities.push(entity);
+    pub fn init_entity<T: IEntityInitializable + IEntityCastable>(
+        &mut self,
+        card: &'static ICard,
+    ) -> EntityError::Result<&mut T> {
+        let entity_id = self.next_eid();
+        let entity = try!(T::new(entity_id, card)) as Box<IEntity>;
+        // Consume id and entity object.
+        self.entities.push(entity);
 
-    // let entity_ref =
-    // self.get_entity_mut(entity_id).unwrap();
-    // let t_ref =
-    // try!(T::try_into_mut(entity_ref).map_err(|x|
-    // EntityCreationError::InvalidCast(x)));
-    //     Ok(t_ref)
-    // }
+        // Since we just created this entity, it's impossible to
+        // fail these operations.
+        let entity_ref = self.get_entity_mut(entity_id).unwrap();
+        let t_ref: EntityError::Result<_> = T::try_into_mut(entity_ref).map_err(|e| e.into());
+        let t_ref = try!(t_ref);
+        Ok(t_ref)
+    }
 
     pub fn get_entity(
         &self,
@@ -169,106 +167,88 @@ impl<'a> GameManager<'a> {
         val
     }
 
-    // fn build_controllers(mut self) -> Result<Self> {
-    //     for idx in 0..MAX_PLAYERS {
-    //         let entity_id = self.next_eid();
-    // let player_idx = 1 + idx; // Player ID is
-    // 1-indexed
-    // let player_name = self.config.player_names[idx
-    // as usize];
-    //         let mut controller =
-    // try!(Controller::new(entity_id,
-    // player_name).map_err(|x|
-    // GameCreationError::InvalidControllerData(x)));
+    fn build_controllers(mut self) -> Result<Self> {
+        for idx in 0..MAX_PLAYERS {
+            let entity_id = self.next_eid();
+            let player_idx = 1 + idx; // Player ID is 1-indexed
+            let player_name = self.config.player_names[idx as usize];
+            let mut controller: Result<_> = Controller::new(entity_id, player_name).map_err(|e| e.into());
+            let mut controller = try!(controller);
 
-    //         // SET ALL CONTROLLER DEFAULT ENTITY TAGS
-    // // TODO; These hardcoded values might be better
-    // off moved
-    //         // into GameConfig.
+            // SET ALL CONTROLLER DEFAULT ENTITY TAGS
+            // TODO; These hardcoded values might be better   off moved
+            // into GameConfig.
 
-    // controller.set_native_tag_value(EGameTags::
-    // Maxhandsize, 10);
-    // controller.set_native_tag_value(EGameTags::
-    // Starthandsize, 4);
-    // controller.set_native_tag_value(EGameTags::
-    // PlayerID, player_idx);
-    // controller.set_native_tag_value(EGameTags::
-    // TeamID, player_idx);
-    // controller.set_native_tag_value(EGameTags::
-    // Controller, player_idx);
-    // controller.set_native_tag_value(EGameTags::Zone,
-    // EZones::Play as u32);
-    // controller.set_native_tag_value(EGameTags::
-    // Maxresources, 10);
+            controller.set_native_tag_value(EGameTags::Maxhandsize, 10);
+            controller.set_native_tag_value(EGameTags::Starthandsize, 4);
+            controller.set_native_tag_value(EGameTags::PlayerID, player_idx);
+            controller.set_native_tag_value(EGameTags::TeamID, player_idx);
+            controller.set_native_tag_value(EGameTags::Controller, player_idx);
+            controller.set_native_tag_value(EGameTags::Zone, EZones::Play as u32);
+            controller.set_native_tag_value(EGameTags::Maxresources, 10);
 
-    //         self.entities.push(Box::new(controller));
-    //     }
+            self.entities.push(Box::new(controller));
+        }
 
-    //     Ok(self)
-    // }
+        Ok(self)
+    }
 
-    // fn build_heroes(mut self) -> Result<Self> {
-    //     if self.config.build_heroes == true {
-    //         for idx in 0..MAX_PLAYERS {
-    // let player_idx = idx + 1; // Player ID is
-    // 1-indexed
+    fn build_heroes(mut self) -> Result<Self> {
+        if self.config.build_heroes == true {
+            for idx in 0..MAX_PLAYERS {
+                let player_idx = idx + 1; // Player ID is 1-indexed
 
-    // let hero_class =
-    // self.config.player_heroclasses[idx as usize].unwrap();
-    // let hero_card =
-    // try!(*CARDS.hero_cards(hero_class).map_err(|x|
-    //             GameCreationError::MissingCardData(x))).first().unwrap();
-    //             let hero =
-    //
-    // try!(self.init_entity::<Hero>(hero_card).map_err(|x|
-    // GameCreationError::HeroConstructionError(x)));
+                // Class is validated by config itself.
+                let hero_class = self.config.player_heroclasses[idx as usize].unwrap();
+                let hero_card: Result<_> = CARDS.hero_cards(hero_class).map_err(|e| e.into());
+                let hero_card = *try!(hero_card).first().unwrap();
 
-    //             // SET DEFAULT HERO TAGS
-    //
-    // hero.set_native_tag_value(EGameTags::Controller,
-    // player_idx);
-    // hero.set_native_tag_value(EGameTags::Zone,
-    // EZones::Play as u32);
-    //         }
-    //     }
+                // Can't fail.
+                let hero = self.init_entity::<Hero>(hero_card).unwrap();
 
-    //     Ok(self)
-    // }
+                // SET DEFAULT HERO TAGS
+                hero.set_native_tag_value(EGameTags::Controller, player_idx);
+                hero.set_native_tag_value(EGameTags::Zone, EZones::Play as u32);
+            }
+        }
 
-    // fn build_hero_powers(mut self) ->
-    // GameCreationResult<Self> {
-    //     if self.config.build_hero_powers == true {
-    //         for idx in 0..MAX_PLAYERS {
-    // let player_idx = idx + 1; // Player ID is
-    // 1-indexed
+        Ok(self)
+    }
 
-    // let hero_class =
-    // self.config.player_heroclasses[idx as usize].unwrap();
-    // let power_card =
-    // try!(*CARDS.hero_power_cards(hero_class).map_err(|x|
-    //             GameCreationError::MissingCardData(x))).first().unwrap();
-    // let hero_power =
-    // try!(self.init_entity::<HeroPower>(power_card).
-    // map_err(|x| {
-    //
-    // GameCreationError::HeroConstructionError(x)
-    //             }));
+    fn build_hero_powers(mut self) -> Result<Self> {
+        if self.config.build_hero_powers == true {
+            for idx in 0..MAX_PLAYERS {
+                let player_idx = idx + 1; // Player ID is 1-indexed
 
-    //             // SET DEFAULT HERO_POWER TAGS
-    //
-    // hero_power.set_native_tag_value(EGameTags::Controller,
-    // player_idx);
-    //
-    // hero_power.set_native_tag_value(EGameTags::Zone,
-    // EZones::Play as u32);
-    //         }
-    //     }
+                let hero_class = self.config.player_heroclasses[idx as usize].unwrap();
+                let power_card: Result<_> = CARDS.hero_power_cards(hero_class).map_err(|e| e.into());
+                let power_card = *try!(power_card).first().unwrap();
 
-    //     Ok(self)
-    // }
+
+                // Can't fail.
+                let hero_power = self.init_entity::<HeroPower>(power_card).unwrap();
+
+                // SET DEFAULT HERO_POWER TAGS
+                hero_power.set_native_tag_value(EGameTags::Controller, player_idx);
+                hero_power.set_native_tag_value(EGameTags::Zone, EZones::Play as u32);
+            }
+        }
+
+        Ok(self)
+    }
 }
 
 impl<'a> IProgram<'a> for GameManager<'a> {
+    fn all_entities(&self) -> Box<Iterator<Item = &'a IEntity>> {
+        // Nightly supports -> impl Iterator<Item....>
+        // instead of ->Box<Iterator<Item..>>
+        let it = self.entities.iter()
+            // Pull reference from box (&Box<IEntity> -> &IEntity).
+            .map(|x| x.as_ref());
+
+        Box::new(it)
+    }
+
     fn shared_state_mut(&mut self) -> &'a mut ISharedState {
         &mut self.shared_state
     }

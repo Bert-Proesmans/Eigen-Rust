@@ -36,6 +36,7 @@ mod cards;
 mod contracts;
 mod game;
 mod state_machine;
+mod card_sets;
 
 pub mod prelude {
     // This module will re-export all important types and
