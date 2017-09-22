@@ -1,5 +1,7 @@
 use std::any::Any;
 use std::fmt;
+use std::hash;
+use std::cmp;
 
 use num_traits::FromPrimitive;
 
@@ -17,15 +19,15 @@ pub trait IEntity: fmt::Debug + fmt::Display {
     // this entity!
 
     /// The card used to build this entity object
-    fn reference_card(&self) -> &'static ICard;
+    fn reference_card(&self) -> &'static (ICard + 'static);
 
     /// Returns a borrow of the internal state of this
     /// object
-    fn _get_data_internal<'e>(&'e self) -> &'e IEntityData;
+    fn _get_data_internal<'e>(&'e self) -> &'e (IEntityData + 'e);
 
     /// Returns a mutable borrow of the internal state of
     /// this object
-    fn _get_data_internal_mut<'e>(&'e mut self) -> &'e mut IEntityData;
+    fn _get_data_internal_mut<'e>(&'e mut self) -> &'e mut (IEntityData + 'e);
 
     /// Returns the value of the provided tag
     ///
@@ -63,20 +65,20 @@ pub trait IEntity: fmt::Debug + fmt::Display {
     fn as_any<'e>(&'e self) -> &'e Any;
 
     /// Return this entity as an IPlayable reference
-    fn as_playable<'e>(&'e self) -> Option<&'e IPlayable>;
+    fn as_playable<'e>(&'e self) -> Option<&'e (IPlayable + 'e)>;
 
     /// Return this entity as an ICharacter reference
-    fn as_character<'e>(&'e self) -> Option<&'e ICharacter>;
+    fn as_character<'e>(&'e self) -> Option<&'e (ICharacter + 'e)>;
 
     /// Method used for mutably downcasting to actual
     /// struct object
     fn as_any_mut<'e>(&'e mut self) -> &'e mut Any;
 
     /// Return this entity as a mutable IPlayable reference
-    fn as_playable_mut<'e>(&'e mut self) -> Option<&'e mut IPlayable>;
+    fn as_playable_mut<'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'e)>;
 
     /// Return this entity as a mutable ICharacter reference
-    fn as_character_mut<'e>(&'e mut self) -> Option<&'e mut ICharacter>;
+    fn as_character_mut<'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'e)>;
 
     ////////////////
     // Properties //
@@ -130,3 +132,17 @@ pub trait IEntity: fmt::Debug + fmt::Display {
         self.native_tag_value(EGameTags::Controller)
     }
 }
+
+impl hash::Hash for IEntity {
+    fn hash<H: hash::Hasher>(&self, state:&mut H) {
+        self._get_data_internal().hash(state);
+    }
+}
+
+impl cmp::PartialEq for IEntity {
+    fn eq(&self, other: &IEntity) -> bool {
+        self._get_data_internal() == self._get_data_internal()
+    }
+}
+
+impl cmp::Eq for IEntity {}

@@ -27,6 +27,8 @@ impl fmt::Display for EntityData {
 impl EntityData {
     pub fn new(entity_id: u32) -> Result<Self> {
         Ok(Self {
+            // ID is stored seperately to prevent abuse through the
+            // hashmap.
             id: entity_id,
             state: hashmap!{EGameTags::EntityID => entity_id}
         })

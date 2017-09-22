@@ -1,5 +1,6 @@
 use std::fmt;
-use std::vec::Drain;
+use std::collections::hash_set::Drain;
+use std::collections::HashSet;
 
 use contracts::entities::playable::IPlayable;
 use contracts::state_machine::method::IMethod;
@@ -13,8 +14,8 @@ const NUM_REGISTERS: u32 = 5;
 
 #[derive(Debug)]
 pub struct SharedState<'a> {
-    playables: Vec<&'a IPlayable>,
-    card_ids: Vec<&'static str>,
+    playables: HashSet<&'a IPlayable>,
+    card_ids: HashSet<u32>,
     registers: [i32; NUM_REGISTERS as usize],
     flags: u32
 }
@@ -31,8 +32,8 @@ impl<'a> fmt::Display for SharedState<'a> {
 impl<'a> SharedState<'a> {
     pub fn new() -> Self {
         Self {
-            playables: vec![],
-            card_ids: vec![],
+            playables: hashset!{},
+            card_ids: hashset!{},
             registers: [0; NUM_REGISTERS as usize],
             flags: 0
         }
@@ -44,11 +45,11 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         NUM_REGISTERS
     }
 
-    fn playables(&self) -> &Vec<&IPlayable> {
+    fn playables(&self) -> &HashSet<&IPlayable> {
         &self.playables
     }
 
-    fn card_ids(&self) -> &Vec<&'static str> {
+    fn card_ids(&self) -> &HashSet<u32> {
         &self.card_ids
     }
 
@@ -63,11 +64,11 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         self.playables.push(subj);
     }
 
-    fn add_card_id(
+    fn add_card_dbf_id(
         &mut self,
-        subj: &'static str,
+        id: u32,
     ) {
-        self.card_ids.push(subj);
+        self.card_ids.push(id);
     }
 
     fn set_register(
@@ -81,11 +82,16 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         }
     }
 
-    fn set_flags(
+    fn enable_flags(
         &mut self,
-        subj: u32,
+        flags: u32,
     ) {
-        self.flags = subj;
+        self.flags |= flags;
+    }
+
+    fn disable_flags(&mut self, flags: u32) {
+        self.flags |= flags;
+        self.flags ^= flags;
     }
 
     fn clear_all(&mut self) {
@@ -103,7 +109,7 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         self.playables.drain(..)
     }
 
-    fn drain_card_ids(&mut self) -> Drain<&'static str> {
+    fn drain_card_ids(&mut self) -> Drain<u32> {
         self.card_ids.drain(..)
     }
 
@@ -114,7 +120,7 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         self.set_register(idx, 0);
     }
 
-    fn clear_flags(&mut self) {
+    fn reset_flags(&mut self) {
         self.flags = 0;
     }
 }

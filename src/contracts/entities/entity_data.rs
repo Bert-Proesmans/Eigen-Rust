@@ -1,4 +1,7 @@
 use std::fmt;
+use std::collections::HashMap;
+use std::hash;
+use std::cmp;
 
 use enums::EGameTags;
 
@@ -32,3 +35,17 @@ pub trait IEntityData: fmt::Debug + fmt::Display {
         tag: EGameTags,
     ) -> Option<u32>;
 }
+
+impl hash::Hash for IEntityData {
+    fn hash<H: hash::Hasher>(&self, state:&mut H) {
+        self.id().hash(state);
+    }
+}
+
+impl cmp::PartialEq for IEntityData {
+    fn eq(&self, other: &IEntityData) -> bool {
+        self.id() == other.id()
+    }
+}
+
+impl cmp::Eq for IEntityData {}
