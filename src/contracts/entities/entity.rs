@@ -1,7 +1,7 @@
 use std::any::Any;
+use std::cmp;
 use std::fmt;
 use std::hash;
-use std::cmp;
 
 use num_traits::FromPrimitive;
 
@@ -23,11 +23,16 @@ pub trait IEntity: fmt::Debug + fmt::Display {
 
     /// Returns a borrow of the internal state of this
     /// object
-    fn _get_data_internal<'e>(&'e self) -> &'e (IEntityData + 'e);
+    // The returned borrow (reference) is valid for the
+    // lifetime of self.
+    // The borrow could reference to objects which live at most
+    // as long as self
+    // [e outlives f].
+    fn _get_data_internal<'e, 'f: 'e>(&'e self) -> &'e (IEntityData + 'f);
 
     /// Returns a mutable borrow of the internal state of
     /// this object
-    fn _get_data_internal_mut<'e>(&'e mut self) -> &'e mut (IEntityData + 'e);
+    fn _get_data_internal_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (IEntityData + 'f);
 
     /// Returns the value of the provided tag
     ///
@@ -62,23 +67,23 @@ pub trait IEntity: fmt::Debug + fmt::Display {
     // /////////////////////
 
     /// Method used for downcasting to actual struct object
-    fn as_any<'e>(&'e self) -> &'e Any;
+    fn as_any<'e, 'f: 'e>(&'e self) -> &'e (Any + 'f);
 
     /// Return this entity as an IPlayable reference
-    fn as_playable<'e>(&'e self) -> Option<&'e (IPlayable + 'e)>;
+    fn as_playable<'e, 'f: 'e>(&'e self) -> Option<&'e (IPlayable + 'f)>;
 
     /// Return this entity as an ICharacter reference
-    fn as_character<'e>(&'e self) -> Option<&'e (ICharacter + 'e)>;
+    fn as_character<'e, 'f: 'e>(&'e self) -> Option<&'e (ICharacter + 'f)>;
 
     /// Method used for mutably downcasting to actual
     /// struct object
-    fn as_any_mut<'e>(&'e mut self) -> &'e mut Any;
+    fn as_any_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (Any + 'f);
 
     /// Return this entity as a mutable IPlayable reference
-    fn as_playable_mut<'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'e)>;
+    fn as_playable_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'f)>;
 
     /// Return this entity as a mutable ICharacter reference
-    fn as_character_mut<'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'e)>;
+    fn as_character_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'f)>;
 
     ////////////////
     // Properties //
@@ -134,14 +139,20 @@ pub trait IEntity: fmt::Debug + fmt::Display {
 }
 
 impl hash::Hash for IEntity {
-    fn hash<H: hash::Hasher>(&self, state:&mut H) {
+    fn hash<H: hash::Hasher>(
+        &self,
+        state: &mut H,
+    ) {
         self._get_data_internal().hash(state);
     }
 }
 
 impl cmp::PartialEq for IEntity {
-    fn eq(&self, other: &IEntity) -> bool {
-        self._get_data_internal() == self._get_data_internal()
+    fn eq(
+        &self,
+        other: &IEntity,
+    ) -> bool {
+        self._get_data_internal() == other._get_data_internal()
     }
 }
 

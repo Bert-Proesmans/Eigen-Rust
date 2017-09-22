@@ -1,6 +1,6 @@
-use std::fmt::{Debug, Display};
-use std::collections::hash_set::Drain;
 use std::collections::HashSet;
+use std::collections::hash_set::Drain;
+use std::fmt::{Debug, Display};
 
 use contracts::entities::playable::IPlayable;
 
@@ -22,23 +22,27 @@ pub trait ISharedState<'a>: Debug + Display {
     /// Returns the integer holding all flags
     fn flags(&self) -> u32;
 
-    /// Appends another IPlayable reference to the stored vector
+    /// Appends another IPlayable reference to the stored
+    /// vector
     fn add_playable(
         &mut self,
         subj: &'a IPlayable,
     );
 
-    /// Appends another card database ID to the stored vector
+    /// Appends another card database ID to the stored
+    /// vector
     fn add_card_dbf_id(
         &mut self,
         id: u32,
     );
 
-    /// Overwrites the value of the provided register with the provided value
+    /// Overwrites the value of the provided register with
+    /// the provided value
     ///
     /// # Panics
     ///
-    /// Panics when the value of `register` is greater or equal than the amount
+    /// Panics when the value of `register` is greater or
+    /// equal than the amount
     /// returned by `register_num`.
     fn set_register(
         &mut self,
@@ -46,7 +50,8 @@ pub trait ISharedState<'a>: Debug + Display {
         value: i32,
     );
 
-    /// Enables the flags, which are provided trough `flags`, within this state
+    /// Enables the flags, which are provided trough
+    /// `flags`, within this state
     ///
     /// # Example
     ///
@@ -57,23 +62,29 @@ pub trait ISharedState<'a>: Debug + Display {
         flags: u32,
     );
 
-    /// Disables the flags, which are provided through `flags`, within this state
+    /// Disables the flags, which are provided through
+    /// `flags`, within this state
     ///
     /// # Example
     ///
     /// TODO; Example
     ///
-    fn disable_flags(&mut self, flags: u32);
+    fn disable_flags(
+        &mut self,
+        flags: u32,
+    );
 
 
     /// Reset all internal fields to their default value
     fn clear_all(&mut self);
 
-    /// Clear the set of IPlayables, returning an iterator over all
+    /// Clear the set of IPlayables, returning an iterator
+    /// over all
     /// removed elements
     fn drain_playables(&mut self) -> Drain<&IPlayable>;
 
-    /// Clear the set of card database ID's, returning an iterator
+    /// Clear the set of card database ID's, returning an
+    /// iterator
     /// over all removed elements
     fn drain_card_ids(&mut self) -> Drain<u32>;
 
@@ -83,6 +94,7 @@ pub trait ISharedState<'a>: Debug + Display {
         idx: u32,
     );
 
-    /// Reset the integer holding all flags to it's default value
+    /// Reset the integer holding all flags to it's default
+    /// value
     fn reset_flags(&mut self);
 }

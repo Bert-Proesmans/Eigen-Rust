@@ -1,7 +1,7 @@
-use std::fmt;
-use std::collections::HashMap;
-use std::hash;
 use std::cmp;
+use std::collections::HashMap;
+use std::fmt;
+use std::hash;
 
 use enums::EGameTags;
 
@@ -36,16 +36,22 @@ pub trait IEntityData: fmt::Debug + fmt::Display {
     ) -> Option<u32>;
 }
 
-impl hash::Hash for IEntityData {
-    fn hash<H: hash::Hasher>(&self, state:&mut H) {
+impl<'a> hash::Hash for IEntityData + 'a {
+    fn hash<H: hash::Hasher>(
+        &self,
+        state: &mut H,
+    ) {
         self.id().hash(state);
     }
 }
 
-impl cmp::PartialEq for IEntityData {
-    fn eq(&self, other: &IEntityData) -> bool {
+impl<'a> cmp::PartialEq for IEntityData + 'a {
+    fn eq(
+        &self,
+        other: &IEntityData,
+    ) -> bool {
         self.id() == other.id()
     }
 }
 
-impl cmp::Eq for IEntityData {}
+impl<'a> cmp::Eq for IEntityData + 'a {}

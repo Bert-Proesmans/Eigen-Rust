@@ -44,11 +44,11 @@ impl IEntity for HeroPower {
         self.card
     }
 
-    fn _get_data_internal(&self) -> &IEntityData {
+    fn _get_data_internal<'e, 'f: 'e>(&'e self) -> &'e (IEntityData + 'f) {
         &self.data
     }
 
-    fn _get_data_internal_mut(&mut self) -> &mut IEntityData {
+    fn _get_data_internal_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (IEntityData + 'f) {
         &mut self.data
     }
 
@@ -71,27 +71,27 @@ impl IEntity for HeroPower {
         None
     }
 
-    fn as_any<'e>(&'e self) -> &'e Any {
+    fn as_any<'e, 'f: 'e>(&'e self) -> &'e (Any + 'f) {
         self
     }
 
-    fn as_playable<'e>(&'e self) -> Option<&'e IPlayable> {
+    fn as_playable<'e, 'f: 'e>(&'e self) -> Option<&'e (IPlayable + 'f)> {
         Some(self)
     }
 
-    fn as_character<'e>(&'e self) -> Option<&'e ICharacter> {
+    fn as_character<'e, 'f: 'e>(&'e self) -> Option<&'e (ICharacter + 'f)> {
         None
     }
 
-    fn as_any_mut<'e>(&'e mut self) -> &'e mut Any {
+    fn as_any_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (Any + 'f) {
         self
     }
 
-    fn as_playable_mut<'e>(&'e mut self) -> Option<&'e mut IPlayable> {
+    fn as_playable_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'f)> {
         Some(self)
     }
 
-    fn as_character_mut<'e>(&'e mut self) -> Option<&'e mut ICharacter> {
+    fn as_character_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'f)> {
         None
     }
 }

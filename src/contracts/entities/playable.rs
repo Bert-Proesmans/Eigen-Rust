@@ -1,4 +1,6 @@
+use std::cmp;
 use std::fmt;
+use std::hash;
 
 use contracts::entities::entity::IEntity;
 
@@ -19,3 +21,23 @@ use contracts::entities::entity::IEntity;
 pub trait IPlayable: fmt::Debug + fmt::Display + IEntity {
     // TODO; Implement
 }
+
+impl<'a> hash::Hash for IPlayable + 'a {
+    fn hash<H: hash::Hasher>(
+        &self,
+        state: &mut H,
+    ) {
+        self._get_data_internal().hash(state);
+    }
+}
+
+impl<'a> cmp::PartialEq for IPlayable + 'a {
+    fn eq(
+        &self,
+        other: &IPlayable,
+    ) -> bool {
+        self._get_data_internal() == other._get_data_internal()
+    }
+}
+
+impl<'a> cmp::Eq for IPlayable + 'a {}

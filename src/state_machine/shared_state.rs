@@ -12,12 +12,21 @@ use enums::EExecutionStates;
 // There are 5 registers provided by this state.
 const NUM_REGISTERS: u32 = 5;
 
-#[derive(Debug)]
 pub struct SharedState<'a> {
-    playables: HashSet<&'a IPlayable>,
+    // SharedState and entities don't outlive each other.
+    playables: HashSet<&'a (IPlayable + 'a)>,
     card_ids: HashSet<u32>,
     registers: [i32; NUM_REGISTERS as usize],
     flags: u32
+}
+
+impl<'a> fmt::Debug for SharedState<'a> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
+        write!(f, "DBG SHAREDSTATE (TODO)")
+    }
 }
 
 impl<'a> fmt::Display for SharedState<'a> {
@@ -109,11 +118,11 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
     }
 
     fn drain_playables(&mut self) -> Drain<&IPlayable> {
-        self.playables.drain(..)
+        self.playables.drain()
     }
 
     fn drain_card_ids(&mut self) -> Drain<u32> {
-        self.card_ids.drain(..)
+        self.card_ids.drain()
     }
 
     fn clear_register(
