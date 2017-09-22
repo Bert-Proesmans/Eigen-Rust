@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use cards::card::Card;
+use contracts::cards::card::ICard;
 
 use enums::{ECardSets, ECardTypes, EGameTags};
 
@@ -20,7 +21,9 @@ use enums::{ECardSets, ECardTypes, EGameTags};
 lazy_static! {
 
     pub static ref EX1_323H: Card = card! {
-        id: "EX1_323h", // First argument MUST BE the card ID!
+        // First arguments HAVE TO BE the identifiers!
+        dbf_id: 5526554,
+        card_id: "EX1_323h",
         name: "Lord Jaraxxus",  // Name in the default language (English), i'm thinking about having
                                 // the possibility to extend cardcontainer to deliver translated
                                 // cardnames to the wrapping code.
@@ -44,8 +47,8 @@ lazy_static! {
     };
 
     // Collect all cards of the set into this hashmap.
-    pub static ref FULL_SET: HashMap<&'static str, &'static Card> = hashmap!{
-        "EX1_323h" => &*EX1_323H
+    pub static ref FULL_SET: HashMap<u32, &'static Card> = hashmap!{
+        EX1_323H.dbf_id() => &*EX1_323H
     };
 
 }
@@ -55,10 +58,11 @@ mod tests {
 
     use super::*;
     use cards::card_container::CARDS;
+    use contracts::cards::card_container::ICardContainer;
 
     #[test]
     fn load_cardset() {
-        let ref set = testset::FULL_SET;
+        let ref set = FULL_SET;
         println!("Amount of cards: {}", set.len());
         println!("-----------");
     }
@@ -72,8 +76,8 @@ mod tests {
 
     #[test]
     fn load_test_card() {
-        let ref container = *cardcontainer::CARDS;
-        let test_card = container.from_id("EX1_323h").expect("Card EX1_323h not found!");
+        let ref container = *CARDS;
+        let test_card = container.from_name("Lord Jaraxxus").expect("Card `Lord Jaraxxus` not found!");
 
         println!("test-card: {:?}", test_card);
         println!("-----------");

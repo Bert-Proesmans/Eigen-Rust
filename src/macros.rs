@@ -15,23 +15,23 @@
 macro_rules! card {
     // This match rule is used to be robust about trailing comma's, since the last field COULD have
     // a trailing comma.
-    (id: $id_val:expr, $($field:ident: $value:expr,)+)
-    => { card!(id: $id_val, $($field: $value),+) };
+    (dbf_id: $dbf_id_val:expr, card_id: $card_id_val:expr, $($field:ident: $value:expr,)+)
+    => { card!(dbf_id: $dbf_id_val, card_id: $card_id_val, $($field: $value),+) };
 
     // Actual implementation of the macro.
     // The macro ENFORCES the first argument to be the ID of the card!
     // The field name equals `id`.
-    (id: $id_val:expr, $($field:ident: $value:expr),*)
+    (dbf_id: $dbf_id_val:expr, card_id: $card_id_val:expr, $($field:ident: $value:expr),*)
     => {
             {
                 // Build new card for ID.
-                let mut _c = $crate::cards::card::Card::new($id_val);
-                // Set data into card, which es provided to      the macro
+                let mut _c = $crate::cards::card::Card::new($dbf_id_val, $card_id_val);
+                // Set data into card, which es provided to the macro
                 // in the form 'field => value'.
                 $(
                     _c.$field = $value;
                 )*
-                // Return the card object, after finalizing             it.
+                // Return the card object, after finalizing it.
                 _c.validate().finalize()
             }
     };
@@ -40,15 +40,16 @@ macro_rules! card {
 macro_rules! card_novalidate {
     // This match rule is used to be robust about trailing comma's, since the last field COULD have
     // a trailing comma.
-    (id: $id_val:expr, $($field:ident: $value:expr,)+) => { card!(id: $id_val, $($field: $value),+) };
+    (dbf_id: $dbf_id_val:expr, card_id: $card_id_val:expr, $($field:ident: $value:expr,)+)
+    => { card!(dbf_id: $dbf_id_val, card_id: $card_id_val, $($field: $value),+) };
 
     // Actual implementation of the macro.
     // The macro ENFORCES the first argument to be the ID of the card!
     // The field name equals `id`.
-    (id: $id_val:expr, $($field:ident: $value:expr),*) => {
+    (dbf_id: $dbf_id_val:expr, card_id: $card_id_val:expr, $($field:ident: $value:expr),*) => {
         {
             // Build new card for ID.
-            let mut _c = $crate::cards::card::Card::new($id_val);
+            let mut _c = $crate::cards::card::Card::new($dbf_id_val, $card_id_val);
             // Set data into card, which es provided to the macro
             // in the form 'field => value'.
             $(

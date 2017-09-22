@@ -8,7 +8,8 @@ use enums::{ECardClasses, ECardSets, ECardTypes, EGameTags, ERarities};
 // use super::errors::*;
 
 pub trait ICard: fmt::Debug + fmt::Display + Sync {
-    fn id(&self) -> &'static str;
+    fn dbf_id(&self) -> u32;
+    fn card_id(&self) -> &'static str;
     fn name(&self) -> &'static str;
     fn _get_data_internal(&self) -> &HashMap<EGameTags, u32>;
     // +'static -> underlying object is NOT a reference (which

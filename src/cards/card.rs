@@ -8,7 +8,8 @@ use enums::{ECardSets, ECardTypes, EGameTags, EPlayRequirements};
 
 #[derive(Debug, Default)]
 pub struct Card {
-    id: &'static str,
+    dbf_id: u32,
+    card_id: &'static str,
     pub name: &'static str,
 
     // Card specifics; need hardcoding during construction!
@@ -32,9 +33,13 @@ pub struct Card {
 unsafe impl Sync for Card {}
 
 impl Card {
-    pub fn new(id: &'static str) -> Self {
+    pub fn new(
+        dbf_id: u32,
+        card_id: &'static str,
+    ) -> Self {
         Self {
-            id: id,
+            dbf_id: dbf_id,
+            card_id: card_id,
 
             // Default WILL build empty collection objects!
             // So we explicitly set most options to None
@@ -52,21 +57,25 @@ impl Card {
     }
 
     pub fn validate(self) -> Self {
+
+        if self.dbf_id == 0 {
+            panic!("card `{:?}` has default value for `dbf_id`: 0", self.card_id);
+        }
+
         // Test enumeration values to not have their respective
         // default keys (= ::Invalid)!
         if self.kind == ECardTypes::default() {
-            println!("card \"{:?}\" has default value for `kind`: {:?}", "ID", "KIND");
+            panic!("card `{:?}` has default value for `kind`: {:?}", self.card_id, self.kind);
         }
 
         if self.set == ECardSets::default() {
-            println!("card \"{:?}\" has default value for `set`: {:?}", "ID", "KIND");
+            panic!("card `{:?}` has default value for `set`: {:?}", self.card_id, self.kind);
         }
 
         self
     }
 
     pub fn finalize(mut self) -> Self {
-
         {
             // Push all public card fields into the internal hashmap.
             let ref mut container = self.card_data;
@@ -99,8 +108,12 @@ impl fmt::Display for Card {
 
 
 impl ICard for Card {
-    fn id(&self) -> &'static str {
-        self.id
+    fn dbf_id(&self) -> u32 {
+        self.dbf_id
+    }
+
+    fn card_id(&self) -> &'static str {
+        self.card_id
     }
 
     fn name(&self) -> &'static str {

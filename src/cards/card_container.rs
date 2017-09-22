@@ -5,6 +5,8 @@ use contracts::cards::card::ICard;
 use contracts::cards::card_container::ICardContainer;
 use contracts::cards::errors::*;
 
+use card_sets::test_set;
+
 use cards::card::Card;
 
 use enums::{ECardClasses, ECardSets, ECardTypes};
@@ -38,7 +40,8 @@ lazy_static! {
 
     // Card used to derive Game entities!
     pub static ref GAME_CARD: Card = card_novalidate! {
-        id: "GAME",
+        dbf_id: 0,
+        card_id: "GAME",
         name: "Game",
         kind: ECardTypes::Game,
         set: ECardSets::TestTemporary // TODO; Change this to no-set after macro update!
@@ -46,7 +49,8 @@ lazy_static! {
 
     // Card used to derive Controller entities!
     pub static ref CONTROLLER_CARD: Card = card_novalidate! {
-        id: "PLAYER",
+        dbf_id: 0,
+        card_id: "PLAYER",
         name: "Player",
         kind: ECardTypes::Player,
         set: ECardSets::TestTemporary // TODO; Change this to no-set after macro update!
@@ -94,13 +98,12 @@ impl CardContainer {
         // PROVISION ALL CARD SETS HERE
 
         // Test set
-        // for (key, value) in ::cardsets::testset::FULL_SET.iter()
-        // {
-        //     // Only this line needs to be adjusted if a different
-        //     // return type for
-        //     // Card is necessary!
-        //     card_data.insert(*key, *value as &ICard);
-        // }
+        for (key, value) in test_set::FULL_SET.iter() {
+            // Only this line needs to be adjusted if a different
+            // return type for
+            // Card is necessary!
+            card_data.insert(*key, *value as &ICard);
+        }
 
         self.construct_collections(card_data)
     }
