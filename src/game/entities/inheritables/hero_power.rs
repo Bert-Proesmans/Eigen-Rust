@@ -63,6 +63,14 @@ impl IEntity for HeroPower {
         tag_value
     }
 
+    fn set_tag_value(
+        &mut self,
+        _tag: EGameTags,
+        _value: u32,
+    ) -> Option<u32> {
+        None
+    }
+
     fn as_any<'e>(&'e self) -> &'e Any {
         self
     }

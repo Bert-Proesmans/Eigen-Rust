@@ -1,5 +1,7 @@
+
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt;
 
 use contracts::entities::entity_data::IEntityData;
 use contracts::entities::entity_data::errors::*;
@@ -11,6 +13,15 @@ use enums::EGameTags;
 pub struct EntityData {
     id: u32,
     state: HashMap<EGameTags, u32>
+}
+
+impl fmt::Display for EntityData {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
+        write!(f, "ENTITYDATA [TODO]")
+    }
 }
 
 impl EntityData {

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use contracts::cards::card::ICard;
@@ -23,7 +23,7 @@ pub struct Card {
     // Some cards need the following fields implemented.
     pub entourage: Option<Vec<&'static str>>,
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
-    pub reference_tags: Option<HashMap<EGameTags, u32>>,
+    pub reference_tags: Option<HashSet<EGameTags>>,
     pub effects: Option<Vec<Box<fmt::Debug>>>,
     pub card_data: HashMap<EGameTags, u32>
 }

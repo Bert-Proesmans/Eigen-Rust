@@ -24,10 +24,23 @@ pub mod errors {
 
 use self::errors::*;
 
+/// This trait is used to downcast IEntities into their
+/// struct type
 // Kinda similar to the nightly trait TryFrom.
-// This trait is used to downcast IEntities into their
-// struct type.
 pub trait IEntityCastable: fmt::Debug + fmt::Display {
+    /// Tries to convert the provided IEntity object into a
+    /// struct type
+    ///
+    /// The resulting type equals the type which was passed
+    /// as generic argument
+    /// for `e`.
     fn try_into<'e>(e: &'e IEntity) -> Result<&'e Self>;
+
+    /// Tries to mutably convert the provided IEntity
+    /// object into a struct type
+    ///
+    /// The resulting type equals the type which was passed
+    /// as generic argument
+    /// for `e`.
     fn try_into_mut<'e>(e: &'e mut IEntity) -> Result<&'e mut Self>;
 }

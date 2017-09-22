@@ -42,7 +42,7 @@ lazy_static! {
         // These fields can be optionally set if needed.. they can also be ommitted.
         entourage: None,
         play_requirements: None,
-        reference_tags: Some(hashmap!{}),
+        reference_tags: Some(hashset!{EGameTags::Battlecry}),
         effects: None,
     };
 
