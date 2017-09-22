@@ -1,6 +1,6 @@
-use std::fmt;
-use std::collections::hash_set::Drain;
 use std::collections::HashSet;
+use std::collections::hash_set::Drain;
+use std::fmt;
 
 use contracts::entities::playable::IPlayable;
 use contracts::state_machine::method::IMethod;
@@ -61,14 +61,14 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         &mut self,
         subj: &'a IPlayable,
     ) {
-        self.playables.push(subj);
+        self.playables.insert(subj);
     }
 
     fn add_card_dbf_id(
         &mut self,
         id: u32,
     ) {
-        self.card_ids.push(id);
+        self.card_ids.insert(id);
     }
 
     fn set_register(
@@ -89,7 +89,10 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         self.flags |= flags;
     }
 
-    fn disable_flags(&mut self, flags: u32) {
+    fn disable_flags(
+        &mut self,
+        flags: u32,
+    ) {
         self.flags |= flags;
         self.flags ^= flags;
     }
@@ -102,7 +105,7 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
             self.clear_register(idx);
         }
 
-        self.clear_flags();
+        self.reset_flags();
     }
 
     fn drain_playables(&mut self) -> Drain<&IPlayable> {
