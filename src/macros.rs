@@ -71,10 +71,19 @@ macro_rules! register_result_type {
 
             self.unwrap()
         }
+
+        fn print_unwrap(self) -> $T_arg {
+            if let Err(ref e) = self {
+                println!("{:}", e.display_chain());
+                panic!("Critical error, see stdout");
+            }
+
+            self.unwrap()
+        }
     };
 
     ($error_type:ty) => {
-        impl<T> $crate::errors::ErrorLogging<T> for ::std::result::Result<T, $error_type>  {
+        impl<T> $crate::errors::ResultLogging<T> for ::std::result::Result<T, $error_type>  {
             register_result_type!(@INNER_CODE, T);
         }
     };

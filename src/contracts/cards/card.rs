@@ -3,20 +3,22 @@ use std::fmt;
 
 use num_traits::FromPrimitive;
 
+use contracts::effects::card_effect::ICardEffect;
+
 use enums::{ECardClasses, ECardSets, ECardTypes, EGameTags, ERarities};
 
 /// Representation of a card in the game
-pub trait ICard: fmt::Debug + fmt::Display + Sync {
+pub trait ICard<'card>: fmt::Debug + fmt::Display + Sync {
     /// Returns Unique Identifier #1; the database ID of
     /// the card
     fn dbf_id(&self) -> u32;
 
     /// Returns Unique Identifier #2; the stringified ID of
     /// the card
-    fn card_id(&self) -> &'static str;
+    fn card_id(&self) -> &'card str;
 
     /// Returns the name of the card
-    fn name(&self) -> &'static str;
+    fn name(&self) -> &'card str;
 
     /// Returns a map of properties assigned to this card
     fn _get_data_internal(&self) -> &HashMap<EGameTags, u32>;
@@ -25,7 +27,7 @@ pub trait ICard: fmt::Debug + fmt::Display + Sync {
     /// with this card
     // +'static -> underlying object is NOT a reference (which
     // typically has a lower lifetime duration).
-    fn effects(&self) -> Option<&Vec<Box<fmt::Debug>>>;
+    fn effects(&self) -> Option<&Vec<Box<ICardEffect<'card> + 'card>>>;
 
     /// Returns a boolean indicating if this card has
     /// implemented effects

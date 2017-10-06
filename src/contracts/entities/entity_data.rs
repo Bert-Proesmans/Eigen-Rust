@@ -36,7 +36,7 @@ pub trait IEntityData: fmt::Debug + fmt::Display {
     ) -> Option<u32>;
 }
 
-impl<'a> hash::Hash for IEntityData + 'a {
+impl<'dx> hash::Hash for IEntityData + 'dx {
     fn hash<H: hash::Hasher>(
         &self,
         state: &mut H,
@@ -45,7 +45,7 @@ impl<'a> hash::Hash for IEntityData + 'a {
     }
 }
 
-impl<'a> cmp::PartialEq for IEntityData + 'a {
+impl<'dx> cmp::PartialEq for IEntityData + 'dx {
     fn eq(
         &self,
         other: &IEntityData,
@@ -54,4 +54,4 @@ impl<'a> cmp::PartialEq for IEntityData + 'a {
     }
 }
 
-impl<'a> cmp::Eq for IEntityData + 'a {}
+impl<'dx> cmp::Eq for IEntityData + 'dx {}

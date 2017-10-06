@@ -13,7 +13,7 @@ use enums::EExecutionStates;
 /// Methods don't take arguments to run and work entirely
 /// based on information within the shared state,
 /// which is held by the program instance.
-pub trait IMethod: Debug + Display {
+pub trait IMethod: Debug + Display + Sync {
     /// Returns the state value of this method object
     fn state(&self) -> EExecutionStates;
 

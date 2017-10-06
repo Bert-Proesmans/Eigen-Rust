@@ -10,7 +10,18 @@ use contracts::state_machine::shared_state::ISharedState;
 use enums::EExecutionStates;
 
 // There are 5 registers provided by this state.
-const NUM_REGISTERS: u32 = 5;
+// DON'T SUPPOSE THE REGISTER CONTENT WILL SURVIVE MULTIPLE
+// IMETHOD RUNS!
+// Use the playables and card_ids for persistent storage.
+const NUM_REGISTERS: u32 = 6;
+
+pub const REG_EID_ONE: u32 = 0;
+pub const REG_EID_TWO: u32 = 1;
+pub const REG_EID_THREE: u32 = 2;
+
+pub const REG_MATH_ONE: u32 = 3;
+pub const REG_MATH_TWO: u32 = 4;
+pub const REG_MATH_THREE: u32 = 5;
 
 pub struct SharedState<'a> {
     // SharedState and entities don't outlive each other.
@@ -82,12 +93,12 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
 
     fn set_register(
         &mut self,
-        register: u32,
+        idx: u32,
         value: i32,
     ) {
         // No-op when out of bounds!
-        if register < NUM_REGISTERS {
-            self.registers[register as usize] = value;
+        if idx < NUM_REGISTERS {
+            self.registers[idx as usize] = value;
         }
     }
 

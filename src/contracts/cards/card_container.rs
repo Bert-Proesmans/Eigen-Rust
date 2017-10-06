@@ -7,49 +7,50 @@ use enums::ECardClasses;
 use super::errors::*;
 
 /// Container object for statically defined card objects
-pub trait ICardContainer: fmt::Debug + fmt::Display + Sync {
+pub trait ICardContainer<'container>
+    : fmt::Debug + fmt::Display + Sync {
     /// Returns the set of all registered card objects,
     /// index by their database ID
-    fn all_cards(&self) -> &HashMap<u32, &'static ICard>;
+    fn all_cards(&self) -> &HashMap<u32, &(ICard + 'container)>;
 
     /// Returns a vector of all cards which belong to the
     /// WILD card set
-    fn all_wild(&self) -> &Vec<&'static ICard>;
+    fn all_wild(&self) -> &Vec<&(ICard + 'container)>;
 
     /// Returns a vector of all cards which belong to the
     /// STANDARD card set
-    fn all_standard(&self) -> &Vec<&'static ICard>;
+    fn all_standard(&self) -> &Vec<&(ICard + 'container)>;
 
     /// Returns a vector of all cards belonging to the WILD
     /// card set, grouped
     /// by their card class
-    fn wild(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>>;
+    fn wild(&self) -> &HashMap<ECardClasses, Vec<&(ICard + 'container)>>;
 
     /// Returns a vector of all cards belonging to the
     /// STANDARD card set, grouped
     /// by their card class
-    fn standard(&self) -> &HashMap<ECardClasses, Vec<&'static ICard>>;
+    fn standard(&self) -> &HashMap<ECardClasses, Vec<&(ICard + 'container)>>;
 
     /// Tries to return the registered card matching the
     /// provided database ID
     fn from_dbf_id(
         &self,
         id: u32,
-    ) -> Result<&'static ICard>;
+    ) -> Result<&(ICard + 'container)>;
 
     /// Tries to return the registered card matching the
     /// provided name
     fn from_name(
         &self,
         name: &str,
-    ) -> Result<&'static ICard>;
+    ) -> Result<&(ICard + 'container)>;
 
     /// Tries to return all HERO type cards belonging to
     /// the provided card class
     fn hero_cards(
         &self,
         class: ECardClasses,
-    ) -> Result<Vec<&'static ICard>>;
+    ) -> Result<Vec<&(ICard + 'container)>>;
 
     /// Tries to return all HERO POWER type cards belonging
     /// to the provided card
@@ -57,5 +58,5 @@ pub trait ICardContainer: fmt::Debug + fmt::Display + Sync {
     fn hero_power_cards(
         &self,
         class: ECardClasses,
-    ) -> Result<Vec<&'static ICard>>;
+    ) -> Result<Vec<&(ICard + 'container)>>;
 }

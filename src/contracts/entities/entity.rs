@@ -14,25 +14,20 @@ use enums::{EGameTags, EZones};
 
 /// Game object which holds a state, which can be
 /// manipulated during the game
-pub trait IEntity: fmt::Debug + fmt::Display {
+pub trait IEntity<'entity>: fmt::Debug + fmt::Display {
     // There is no direct reference to the game which holds
     // this entity!
 
     /// The card used to build this entity object
-    fn reference_card(&self) -> &'static (ICard + 'static);
+    fn reference_card(&self) -> &(ICard + 'static);
 
     /// Returns a borrow of the internal state of this
     /// object
-    // The returned borrow (reference) is valid for the
-    // lifetime of self.
-    // The borrow could reference to objects which live at most
-    // as long as self
-    // [e outlives f].
-    fn _get_data_internal<'e, 'f: 'e>(&'e self) -> &'e (IEntityData + 'f);
+    fn _get_data_internal(&self) -> &(IEntityData + 'entity);
 
     /// Returns a mutable borrow of the internal state of
     /// this object
-    fn _get_data_internal_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (IEntityData + 'f);
+    fn _get_data_internal_mut(&mut self) -> &mut (IEntityData + 'entity);
 
     /// Returns the value of the provided tag
     ///
@@ -67,23 +62,23 @@ pub trait IEntity: fmt::Debug + fmt::Display {
     // /////////////////////
 
     /// Method used for downcasting to actual struct object
-    fn as_any<'e, 'f: 'e>(&'e self) -> &'e (Any + 'f);
+    fn as_any(&self) -> &(Any + 'entity);
 
     /// Return this entity as an IPlayable reference
-    fn as_playable<'e, 'f: 'e>(&'e self) -> Option<&'e (IPlayable + 'f)>;
+    fn as_playable(&self) -> Option<&(IPlayable + 'entity)>;
 
     /// Return this entity as an ICharacter reference
-    fn as_character<'e, 'f: 'e>(&'e self) -> Option<&'e (ICharacter + 'f)>;
+    fn as_character(&self) -> Option<&(ICharacter + 'entity)>;
 
     /// Method used for mutably downcasting to actual
     /// struct object
-    fn as_any_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (Any + 'f);
+    fn as_any_mut(&mut self) -> &mut (Any + 'entity);
 
     /// Return this entity as a mutable IPlayable reference
-    fn as_playable_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'f)>;
+    fn as_playable_mut(&mut self) -> Option<&mut (IPlayable + 'entity)>;
 
     /// Return this entity as a mutable ICharacter reference
-    fn as_character_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'f)>;
+    fn as_character_mut(&mut self) -> Option<&mut (ICharacter + 'entity)>;
 
     ////////////////
     // Properties //
@@ -138,7 +133,7 @@ pub trait IEntity: fmt::Debug + fmt::Display {
     }
 }
 
-impl hash::Hash for IEntity {
+impl<'ex> hash::Hash for IEntity<'ex> {
     fn hash<H: hash::Hasher>(
         &self,
         state: &mut H,
@@ -147,13 +142,13 @@ impl hash::Hash for IEntity {
     }
 }
 
-impl cmp::PartialEq for IEntity {
+impl<'ex> cmp::PartialEq for IEntity<'ex> {
     fn eq(
         &self,
-        other: &IEntity,
+        other: &IEntity<'ex>,
     ) -> bool {
         self._get_data_internal() == other._get_data_internal()
     }
 }
 
-impl cmp::Eq for IEntity {}
+impl<'ex> cmp::Eq for IEntity<'ex> {}

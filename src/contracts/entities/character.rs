@@ -9,7 +9,8 @@ use contracts::entities::playable::IPlayable;
 /// A character can perform actions which affect other
 /// characters. The most
 /// important property is that a character can die!
-pub trait ICharacter
-    : fmt::Debug + fmt::Display + IEntity + IPlayable {
+pub trait ICharacter<'character>
+    : fmt::Debug + fmt::Display + IEntity<'character> + IPlayable<'character>
+    {
     // TODO; Implement
 }

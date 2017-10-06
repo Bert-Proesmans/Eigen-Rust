@@ -2,12 +2,13 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use contracts::cards::card::ICard;
+use contracts::effects::card_effect::ICardEffect;
 // use contracts::cards::errors::*;
 
 use enums::{ECardSets, ECardTypes, EGameTags, EPlayRequirements};
 
 #[derive(Debug, Default)]
-pub struct Card {
+pub struct Card<'card> {
     dbf_id: u32,
     card_id: &'static str,
     pub name: &'static str,
@@ -24,15 +25,15 @@ pub struct Card {
     pub entourage: Option<Vec<&'static str>>,
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
     pub reference_tags: Option<HashSet<EGameTags>>,
-    pub effects: Option<Vec<Box<fmt::Debug>>>,
+    pub effects: Option<Vec<Box<ICardEffect<'card> + 'card>>>,
     pub card_data: HashMap<EGameTags, u32>
 }
 
 // Force implement the Sync trait since we guarantee
 // that no edits after construction are allowed!
-unsafe impl Sync for Card {}
+unsafe impl<'cx> Sync for Card<'cx> {}
 
-impl Card {
+impl<'cx> Card<'cx> {
     pub fn new(
         dbf_id: u32,
         card_id: &'static str,
@@ -97,7 +98,7 @@ impl Card {
     }
 }
 
-impl fmt::Display for Card {
+impl<'cx> fmt::Display for Card<'cx> {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -107,7 +108,7 @@ impl fmt::Display for Card {
 }
 
 
-impl ICard for Card {
+impl<'cx> ICard<'cx> for Card<'cx> {
     fn dbf_id(&self) -> u32 {
         self.dbf_id
     }
@@ -124,9 +125,7 @@ impl ICard for Card {
         &self.card_data
     }
 
-    // +'static -> underlying object is NOT a reference (which
-    // typically has a lower lifetime duration).
-    fn effects(&self) -> Option<&Vec<Box<fmt::Debug + 'static>>> {
+    fn effects(&self) -> Option<&Vec<Box<ICardEffect<'cx> + 'cx>>> {
         self.effects.as_ref()
     }
 }

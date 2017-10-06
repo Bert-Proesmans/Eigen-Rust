@@ -30,31 +30,35 @@ extern crate chrono;
 mod macros;
 pub mod enums;
 mod errors;
-mod game_manager;
 
-mod cards;
+
 mod contracts;
-mod game;
-mod state_machine;
+mod cards;
 mod card_sets;
+// mod game_manager;
+// mod game;
+// mod state_machine;
 
-pub mod prelude {
-    // This module will re-export all important types and
-    // traits.
+// mod effects;
 
-    // All contracts are put in the prelude to be able to use
-    // their defined
-    // methods everywhere.
+// pub mod prelude {
+//     // This module will re-export all important types and
+//     // traits.
 
-    pub use contracts::*;
+// // All contracts are put in the prelude to be able
+// to use
+//     // their defined
+//     // methods everywhere.
 
-    pub use game::config::GameConfig;
-    pub use game_manager::GameManager;
+//     pub use contracts::*;
 
-    pub use cards::card_container::CARDS;
+//     pub use game::config::GameConfig;
+//     pub use game_manager::GameManager;
 
-    pub use errors::*;
-}
+//     pub use cards::card_container::CARDS;
+
+//     pub use errors::*;
+// }
 
 
 #[cfg(test)]

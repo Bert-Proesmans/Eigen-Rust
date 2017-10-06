@@ -18,11 +18,12 @@ use contracts::entities::entity::IEntity;
 /// As a result of this action that entity moves from HAND
 /// zone to PLAY zone,
 /// where it's effects are executed.
-pub trait IPlayable: fmt::Debug + fmt::Display + IEntity {
+pub trait IPlayable<'playable>
+    : fmt::Debug + fmt::Display + IEntity<'playable> {
     // TODO; Implement
 }
 
-impl<'a> hash::Hash for IPlayable + 'a {
+impl<'px> hash::Hash for IPlayable<'px> {
     fn hash<H: hash::Hasher>(
         &self,
         state: &mut H,
@@ -31,13 +32,13 @@ impl<'a> hash::Hash for IPlayable + 'a {
     }
 }
 
-impl<'a> cmp::PartialEq for IPlayable + 'a {
+impl<'px> cmp::PartialEq for IPlayable<'px> {
     fn eq(
         &self,
-        other: &IPlayable,
+        other: &IPlayable<'px>,
     ) -> bool {
         self._get_data_internal() == other._get_data_internal()
     }
 }
 
-impl<'a> cmp::Eq for IPlayable + 'a {}
+impl<'px> cmp::Eq for IPlayable<'px> {}

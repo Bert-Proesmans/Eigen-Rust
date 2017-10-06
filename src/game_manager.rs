@@ -172,7 +172,7 @@ impl<'a> GameManager<'a> {
             let entity_id = self.next_eid();
             let player_idx = 1 + idx; // Player ID is 1-indexed
             let player_name = self.config.player_names[idx as usize];
-            let mut controller: Result<_> = Controller::new(entity_id, player_name).map_err(|e| e.into());
+            let controller: Result<_> = Controller::new(entity_id, player_name).map_err(|e| e.into());
             let mut controller = try!(controller);
 
             // SET ALL CONTROLLER DEFAULT ENTITY TAGS
@@ -249,7 +249,7 @@ impl<'a> IProgram<'a> for GameManager<'a> {
         Box::new(it)
     }
 
-    fn shared_state_mut(&'a mut self) -> &'a mut ISharedState {
+    fn shared_state_mut(&'a mut self) -> &'a mut (ISharedState + 'a) {
         &mut self.shared_state
     }
 

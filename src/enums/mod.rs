@@ -17,3 +17,15 @@ impl Default for ECardSets {
         ECardSets::NoSet
     }
 }
+
+impl Default for EActivationTargets {
+    fn default() -> Self {
+        EActivationTargets::NoTarget
+    }
+}
+
+impl Default for EActivationRequirements {
+    fn default() -> Self {
+        EActivationRequirements::NoReq
+    }
+}

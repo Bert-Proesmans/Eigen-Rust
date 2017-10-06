@@ -36,10 +36,10 @@ pub const WILD_SET: [ECardSets; 13] = [ECardSets::Core,
 
 lazy_static! {
     // The ONE container for all cards!
-    pub static ref CARDS: CardContainer = CardContainer::new();
+    pub static ref CARDS: CardContainer<'static> = CardContainer::new();
 
     // Card used to derive Game entities!
-    pub static ref GAME_CARD: Card = card_novalidate! {
+    pub static ref GAME_CARD: Card<'static> = card_novalidate! {
         dbf_id: 0,
         card_id: "GAME",
         name: "Game",
@@ -48,7 +48,7 @@ lazy_static! {
     };
 
     // Card used to derive Controller entities!
-    pub static ref CONTROLLER_CARD: Card = card_novalidate! {
+    pub static ref CONTROLLER_CARD: Card<'static> = card_novalidate! {
         dbf_id: 0,
         card_id: "PLAYER",
         name: "Player",
@@ -58,17 +58,17 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub struct CardContainer {
-    all_cards: Option<HashMap<u32, &'static ICard>>,
+pub struct CardContainer<'container> {
+    all_cards: Option<HashMap<u32, &'container (ICard<'static> + 'static)>>,
 
-    all_collectible_standard: Option<Vec<&'static ICard>>,
-    all_collectible_wild: Option<Vec<&'static ICard>>,
+    all_collectible_standard: Option<Vec<&'container (ICard<'static> + 'static)>>,
+    all_collectible_wild: Option<Vec<&'container (ICard<'static> + 'static)>>,
 
-    all_collectible_standard_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>,
-    all_collectible_wild_per_class: Option<HashMap<ECardClasses, Vec<&'static ICard>>>
+    all_collectible_standard_per_class: Option<HashMap<ECardClasses, Vec<&'container (ICard<'static> + 'static)>>>,
+    all_collectible_wild_per_class: Option<HashMap<ECardClasses, Vec<&'container (ICard<'static> + 'static)>>>
 }
 
-impl fmt::Display for CardContainer {
+impl<'cx> fmt::Display for CardContainer<'cx> {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -77,8 +77,8 @@ impl fmt::Display for CardContainer {
     }
 }
 
-impl CardContainer {
-    fn new() -> CardContainer {
+impl CardContainer<'static> {
+    fn new() -> CardContainer<'static> {
         // Create empty container.
         let container = CardContainer {
             all_cards: None,
@@ -142,7 +142,7 @@ impl CardContainer {
     }
 }
 
-impl ICardContainer for CardContainer {
+impl<'cx> ICardContainer<'cx> for CardContainer<'cx> {
     fn all_cards(&self) -> &HashMap<u32, &'static ICard> {
         self.all_cards.as_ref().unwrap()
     }

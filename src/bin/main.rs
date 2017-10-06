@@ -12,7 +12,7 @@ use std::fs::File;
 use chrono::prelude::*;
 use slog::Drain;
 
-use eigen_rust::prelude::*;
+// use eigen_rust::prelude::*;
 use eigen_rust::enums::{EFormats,ECardClasses};
 
 fn main() {
@@ -43,25 +43,25 @@ fn main() {
 
 
     // Setup game config.
-    let mut config = GameConfig::new();
-    config.game_format = Some(EFormats::Standard);
-    config.player_names[0] = "P1";
-    config.player_names[1] = "P2";
-    config.player_heroclasses[0] = Some(ECardClasses::Rogue);
-    config.player_heroclasses[1] = Some(ECardClasses::Mage);
-    // Remove when there are more cards implemented
-    config.build_heroes = false;
-    config.build_hero_powers = false;
+    // let mut config = GameConfig::new();
+    // config.game_format = Some(EFormats::Standard);
+    // config.player_names[0] = "P1";
+    // config.player_names[1] = "P2";
+    // config.player_heroclasses[0] = Some(ECardClasses::Rogue);
+    // config.player_heroclasses[1] = Some(ECardClasses::Mage);
+    // // Remove when there are more cards implemented
+    // config.build_heroes = false;
+    // config.build_hero_powers = false;
 
-    config.player_decks[0] = Some(vec![
-        CARDS.from_name("Lord Jaraxxus").log_unwrap(&root_logger)
-    ]);
+    // config.player_decks[0] = Some(vec![
+    //     CARDS.from_name("Lord Jaraxxus").log_unwrap(&root_logger)
+    // ]);
 
 
-    info!(root_logger, "GameConfig UPDATED";
-                        "config" => format!("{:?}", config));
+    // info!(root_logger, "GameConfig UPDATED";
+    //                     "config" => format!("{:?}", config));
 
-    // Setup game.
+    // // Setup game.
 
-    let mut _game_man = GameManager::new(config, root_logger);
+    // let mut _game_man = GameManager::new(config, root_logger);
 }

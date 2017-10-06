@@ -14,12 +14,12 @@ use enums::{EExecutionStates, EGameSteps};
 /// and is responsible for executing the dynamic effects
 /// (which are represented
 /// by the IMethod trait).
-pub trait IProgram<'a>: Debug + Display {
+pub trait IProgram<'program>: Debug + Display {
     /// Returns all created entities for the attached game
-    fn all_entities(&'a self) -> Box<Iterator<Item = &'a IEntity> + 'a>;
+    fn all_entities(&self) -> Box<Iterator<Item = &(IEntity + 'program)> + 'program>;
 
     /// Returns the mutable shared state of this program
-    fn shared_state_mut(&'a mut self) -> &'a mut ISharedState;
+    fn shared_state_mut(&mut self) -> &mut (ISharedState<'program> + 'program);
 
     /// Process the next queued method
     fn process_next(&mut self) -> EExecutionStates;
