@@ -14,7 +14,7 @@ pub trait ISharedState<'program>: Debug + Display {
     fn register_num(&self) -> u32;
 
     /// Returns the stored set of IPlayable references
-    fn playables(&self) -> &HashSet<&(IPlayable + 'program)>;
+    fn playables(&self) -> &HashSet<u32>;
 
     /// Returns the stored set of card database ID's
     fn card_ids(&self) -> &HashSet<u32>;
@@ -26,7 +26,7 @@ pub trait ISharedState<'program>: Debug + Display {
     /// vector
     fn add_playable(
         &mut self,
-        subj: &(IPlayable + 'program),
+        subj: &'program IPlayable<'program>,
     );
 
     /// Appends another card database ID to the stored
@@ -81,7 +81,7 @@ pub trait ISharedState<'program>: Debug + Display {
     /// Clear the set of IPlayables, returning an iterator
     /// over all
     /// removed elements
-    fn drain_playables(&mut self) -> Drain<&(IPlayable + 'program)>;
+    fn drain_playables(&mut self) -> Drain<u32>;
 
     /// Clear the set of card database ID's, returning an
     /// iterator

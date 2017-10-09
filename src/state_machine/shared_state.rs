@@ -23,15 +23,17 @@ pub const REG_MATH_ONE: u32 = 3;
 pub const REG_MATH_TWO: u32 = 4;
 pub const REG_MATH_THREE: u32 = 5;
 
-pub struct SharedState<'a> {
-    // SharedState and entities don't outlive each other.
-    playables: HashSet<&'a (IPlayable + 'a)>,
+pub struct SharedState {
+    // The playables are stored by their entity ID.
+    // It's not allowed to hold a reference to Playable objects if these
+    // objects are contained by the container of this state.
+    playables: HashSet<u32>,
     card_ids: HashSet<u32>,
     registers: [i32; NUM_REGISTERS as usize],
     flags: u32
 }
 
-impl<'a> fmt::Debug for SharedState<'a> {
+impl fmt::Debug for SharedState {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -40,7 +42,7 @@ impl<'a> fmt::Debug for SharedState<'a> {
     }
 }
 
-impl<'a> fmt::Display for SharedState<'a> {
+impl fmt::Display for SharedState {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -49,7 +51,7 @@ impl<'a> fmt::Display for SharedState<'a> {
     }
 }
 
-impl<'a> SharedState<'a> {
+impl SharedState {
     pub fn new() -> Self {
         Self {
             playables: hashset!{},
@@ -60,12 +62,12 @@ impl<'a> SharedState<'a> {
     }
 }
 
-impl<'a> ISharedState<'a> for SharedState<'a> {
+impl<'px> ISharedState<'px> for SharedState {
     fn register_num(&self) -> u32 {
         NUM_REGISTERS
     }
 
-    fn playables(&self) -> &HashSet<&IPlayable> {
+    fn playables(&self) -> &HashSet<u32> {
         &self.playables
     }
 
@@ -79,9 +81,9 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
 
     fn add_playable(
         &mut self,
-        subj: &'a IPlayable,
+        subj: &'px IPlayable<'px>,
     ) {
-        self.playables.insert(subj);
+        self.playables.insert(subj.id());
     }
 
     fn add_card_dbf_id(
@@ -128,7 +130,7 @@ impl<'a> ISharedState<'a> for SharedState<'a> {
         self.reset_flags();
     }
 
-    fn drain_playables(&mut self) -> Drain<&IPlayable> {
+    fn drain_playables(&mut self) -> Drain<u32> {
         self.playables.drain()
     }
 

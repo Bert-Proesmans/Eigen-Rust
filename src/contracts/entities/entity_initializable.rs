@@ -21,8 +21,8 @@ pub trait IEntityInitializable: fmt::Debug + fmt::Display {
     /// constructed during
     /// construction.
     ///
-    fn new<'e>(
+    fn new<'program>(
         entity_id: u32,
-        &'static ICard,
-    ) -> Result<Box<IEntity<'e>>>;
+        &'program ICard,
+    ) -> Result<Box<IEntity<'program>>>;
 }

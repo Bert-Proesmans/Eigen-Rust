@@ -65,7 +65,7 @@ macro_rules! register_result_type {
     (@INNER_CODE, $T_arg:tt) => {
         fn log_unwrap(self, logger: &::slog::Logger) -> $T_arg {
             if let Err(ref e) = self {
-                crit!(logger, ""; "error" => %e);
+                crit!(logger, ""; "error" => %e.display_chain());
                 panic!("Critical error, see log");
             }
 

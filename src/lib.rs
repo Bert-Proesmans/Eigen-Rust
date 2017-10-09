@@ -31,34 +31,31 @@ mod macros;
 pub mod enums;
 mod errors;
 
-
 mod contracts;
 mod cards;
 mod card_sets;
-// mod game_manager;
-// mod game;
-// mod state_machine;
+mod game_manager;
+mod game;
+mod state_machine;
 
 // mod effects;
 
-// pub mod prelude {
-//     // This module will re-export all important types and
-//     // traits.
+pub mod prelude {
+    // This module will re-export all important types and
+    // traits.
 
-// // All contracts are put in the prelude to be able
-// to use
-//     // their defined
-//     // methods everywhere.
+    // All contracts are put in the prelude to be able to use
+    // their defined methods everywhere.
 
-//     pub use contracts::*;
+    pub use contracts::*;
 
-//     pub use game::config::GameConfig;
-//     pub use game_manager::GameManager;
+    pub use game::config::GameConfig;
+    pub use game_manager::GameManager;
 
-//     pub use cards::card_container::CARDS;
+    pub use cards::card_container::CARDS;
 
-//     pub use errors::*;
-// }
+    pub use errors::*;
+}
 
 
 #[cfg(test)]

@@ -23,7 +23,7 @@ pub struct GameConfig {
 
     // It's not possible to have an array of vectors.. or an array of a large amount of cards.
     // This is a serious limitation so we have to fall back to a vector of vectors..
-    pub player_decks: Vec<Option<Vec<&'static ICard>>>,
+    pub player_decks: Vec<Option<Vec<&'static ICard<'static>>>>,
 
     pub fill_decks: bool,
     pub shuffle: bool,

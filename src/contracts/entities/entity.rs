@@ -19,7 +19,7 @@ pub trait IEntity<'entity>: fmt::Debug + fmt::Display {
     // this entity!
 
     /// The card used to build this entity object
-    fn reference_card(&self) -> &(ICard + 'static);
+    fn reference_card(&self) -> &ICard<'entity>;
 
     /// Returns a borrow of the internal state of this
     /// object
@@ -65,20 +65,20 @@ pub trait IEntity<'entity>: fmt::Debug + fmt::Display {
     fn as_any(&self) -> &(Any + 'entity);
 
     /// Return this entity as an IPlayable reference
-    fn as_playable(&self) -> Option<&(IPlayable + 'entity)>;
+    fn as_playable(&self) -> Option<&IPlayable<'entity>>;
 
     /// Return this entity as an ICharacter reference
-    fn as_character(&self) -> Option<&(ICharacter + 'entity)>;
+    fn as_character(&self) -> Option<&ICharacter<'entity>>;
 
     /// Method used for mutably downcasting to actual
     /// struct object
     fn as_any_mut(&mut self) -> &mut (Any + 'entity);
 
     /// Return this entity as a mutable IPlayable reference
-    fn as_playable_mut(&mut self) -> Option<&mut (IPlayable + 'entity)>;
+    fn as_playable_mut(&mut self) -> Option<&mut IPlayable<'entity>>;
 
     /// Return this entity as a mutable ICharacter reference
-    fn as_character_mut(&mut self) -> Option<&mut (ICharacter + 'entity)>;
+    fn as_character_mut(&mut self) -> Option<&mut ICharacter<'entity>>;
 
     ////////////////
     // Properties //

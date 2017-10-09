@@ -13,14 +13,13 @@ use contracts::entities::errors as EntityError;
 
 use cards::card_container::CONTROLLER_CARD;
 use game::entities::entity_data::EntityData;
-use game::entities::inheritables::hero::Hero;
 
 use enums::{ECardTypes, EGameTags};
 
 #[derive(Debug)]
-pub struct Controller {
+pub struct Controller<'controller> {
     data: EntityData,
-    card: &'static ICard,
+    card: &'controller ICard<'controller>,
     name: &'static str,
 
     // TODO
@@ -28,7 +27,7 @@ pub struct Controller {
     choice: Option<u32>
 }
 
-impl fmt::Display for Controller {
+impl<'cx> fmt::Display for Controller<'cx> {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -37,7 +36,7 @@ impl fmt::Display for Controller {
     }
 }
 
-impl Controller {
+impl<'cx> Controller<'cx> {
     pub fn new(
         id: u32,
         name: &'static str,
@@ -49,7 +48,7 @@ impl Controller {
 
         Ok(Self {
             data: controller_entity_data,
-            card: &*CONTROLLER_CARD as &ICard,
+            card: &*CONTROLLER_CARD, // Coerce 'static into 'cx
             name: name,
 
             zones: 0,
@@ -58,16 +57,16 @@ impl Controller {
     }
 }
 
-impl IEntity for Controller {
-    fn reference_card(&self) -> &'static ICard {
+impl<'cx> IEntity<'cx> for Controller<'cx> {
+    fn reference_card(&self) -> &ICard<'cx> {
         self.card
     }
 
-    fn _get_data_internal<'e, 'f: 'e>(&'e self) -> &'e (IEntityData + 'f) {
+    fn _get_data_internal(&self) -> &(IEntityData + 'cx) {
         &self.data
     }
 
-    fn _get_data_internal_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (IEntityData + 'f) {
+    fn _get_data_internal_mut(&mut self) -> &mut (IEntityData + 'cx) {
         &mut self.data
     }
 
@@ -90,32 +89,32 @@ impl IEntity for Controller {
         None
     }
 
-    fn as_any<'e, 'f: 'e>(&'e self) -> &'e (Any + 'f) {
+    fn as_any(&self) -> &(Any + 'cx) {
         self
     }
 
-    fn as_playable<'e, 'f: 'e>(&'e self) -> Option<&'e (IPlayable + 'f)> {
+    fn as_playable(&self) -> Option<&IPlayable<'cx>> {
         None
     }
 
-    fn as_character<'e, 'f: 'e>(&'e self) -> Option<&'e (ICharacter + 'f)> {
+    fn as_character(&self) -> Option<&ICharacter<'cx>> {
         None
     }
 
-    fn as_any_mut<'e, 'f: 'e>(&'e mut self) -> &'e mut (Any + 'f) {
+    fn as_any_mut(&mut self) -> &mut (Any + 'cx) {
         self
     }
 
-    fn as_playable_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (IPlayable + 'f)> {
+    fn as_playable_mut(&mut self) -> Option<&mut IPlayable<'cx>> {
         None
     }
 
-    fn as_character_mut<'e, 'f: 'e>(&'e mut self) -> Option<&'e mut (ICharacter + 'f)> {
+    fn as_character_mut(&mut self) -> Option<&mut ICharacter<'cx>> {
         None
     }
 }
 
-impl IEntityCastable for Controller {
+impl<'cx> IEntityCastable for Controller<'cx> {
     fn try_into<'e>(_e: &'e IEntity) -> CastError::Result<&'e Self> {
         // cast_entity!(e, (ECardTypes::Player), Controller)
         bail!(CastError::ErrorKind::NoCastProvided)

@@ -1,6 +1,7 @@
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::VecDeque;
 use std::fmt;
+use std::slice::Iter;
 
 use slog;
 use slog::Drain;
@@ -25,8 +26,8 @@ use game::config::{GameConfig, MAX_PLAYERS};
 use game::entities::controller::Controller;
 
 use game::entities::game::Game;
-use game::entities::inheritables::hero::Hero;
-use game::entities::inheritables::hero_power::HeroPower;
+// use game::entities::inheritables::hero::Hero;
+// use game::entities::inheritables::hero_power::HeroPower;
 
 use state_machine::shared_state::SharedState;
 
@@ -49,11 +50,11 @@ pub mod errors {
 use self::errors::*;
 
 #[derive(Debug)]
-pub struct GameManager<'a> {
+pub struct GameManager<'program> {
     config: GameConfig,
     logger: slog::Logger,
 
-    entities: Vec<Box<IEntity>>,
+    entities: Vec<Box<IEntity<'program> + 'program>>,
 
     next_eid: u32,
     next_oop: u32,
@@ -61,10 +62,10 @@ pub struct GameManager<'a> {
     // Game simulation.
     current_step: EGameSteps,
     method_queue: VecDeque<Box<IMethod>>,
-    shared_state: SharedState<'a>
+    shared_state: SharedState
 }
 
-impl<'a> fmt::Display for GameManager<'a> {
+impl<'px> fmt::Display for GameManager<'px> {
     fn fmt(
         &self,
         f: &mut fmt::Formatter,
@@ -73,7 +74,7 @@ impl<'a> fmt::Display for GameManager<'a> {
     }
 }
 
-impl<'a> GameManager<'a> {
+impl<'px> GameManager<'px> {
     pub fn new<L: Into<Option<slog::Logger>>>(
         config: GameConfig,
         logger: L,
@@ -107,15 +108,15 @@ impl<'a> GameManager<'a> {
 
 
         let obj = try!(obj.build_controllers());
-        let obj = try!(obj.build_heroes());
-        let obj = try!(obj.build_hero_powers());
+        // let obj = try!(obj.build_heroes());
+        // let obj = try!(obj.build_hero_powers());
 
         Ok(obj)
     }
 
     pub fn init_entity<T: IEntityInitializable + IEntityCastable>(
         &mut self,
-        card: &'static ICard,
+        card: &'px ICard,
     ) -> EntityError::Result<&mut T> {
         let entity_id = self.next_eid();
         let entity = try!(T::new(entity_id, card)) as Box<IEntity>;
@@ -133,14 +134,14 @@ impl<'a> GameManager<'a> {
     pub fn get_entity(
         &self,
         entity_id: u32,
-    ) -> Option<&IEntity> {
+    ) -> Option<&IEntity<'px>> {
         self.entities.get(entity_id as usize).map(|box_ref| box_ref.borrow())
     }
 
     pub fn get_entity_mut(
         &mut self,
         entity_id: u32,
-    ) -> Option<&mut IEntity> {
+    ) -> Option<&mut IEntity<'px>> {
         let val = match self.entities.get_mut(entity_id as usize) {
             Some(entity) => {
                 let z: &mut IEntity = entity.borrow_mut();
@@ -193,63 +194,75 @@ impl<'a> GameManager<'a> {
         Ok(self)
     }
 
-    fn build_heroes(mut self) -> Result<Self> {
-        if self.config.build_heroes == true {
-            for idx in 0..MAX_PLAYERS {
-                let player_idx = idx + 1; // Player ID is 1-indexed
+    // fn build_heroes(mut self) -> Result<Self> {
+    //     if self.config.build_heroes == true {
+    //         for idx in 0..MAX_PLAYERS {
+    // let player_idx = idx + 1; // Player ID is
+    // 1-indexed
 
-                // Class is validated by config itself.
-                let hero_class = self.config.player_heroclasses[idx as usize].unwrap();
-                let hero_card: Result<_> = CARDS.hero_cards(hero_class).map_err(|e| e.into());
-                let hero_card = *try!(hero_card).first().unwrap();
+    //             // Class is validated by config itself.
+    // let hero_class =
+    // self.config.player_heroclasses[idx as usize].unwrap();
+    // let hero_card: Result<_> =
+    // CARDS.hero_cards(hero_class).map_err(|e| e.into());
+    // let hero_card =
+    // *try!(hero_card).first().unwrap();
 
-                // Can't fail.
-                let hero = self.init_entity::<Hero>(hero_card).unwrap();
+    //             // Can't fail.
+    // let hero =
+    // self.init_entity::<Hero>(hero_card).unwrap();
 
-                // SET DEFAULT HERO TAGS
-                hero.set_native_tag_value(EGameTags::Controller, player_idx);
-                hero.set_native_tag_value(EGameTags::Zone, EZones::Play as u32);
-            }
-        }
+    //             // SET DEFAULT HERO TAGS
+    //
+    // hero.set_native_tag_value(EGameTags::Controller,
+    // player_idx);
+    // hero.set_native_tag_value(EGameTags::Zone,
+    // EZones::Play as u32);
+    //         }
+    //     }
 
-        Ok(self)
-    }
+    //     Ok(self)
+    // }
 
-    fn build_hero_powers(mut self) -> Result<Self> {
-        if self.config.build_hero_powers == true {
-            for idx in 0..MAX_PLAYERS {
-                let player_idx = idx + 1; // Player ID is 1-indexed
+    // fn build_hero_powers(mut self) -> Result<Self> {
+    //     if self.config.build_hero_powers == true {
+    //         for idx in 0..MAX_PLAYERS {
+    // let player_idx = idx + 1; // Player ID is
+    // 1-indexed
 
-                let hero_class = self.config.player_heroclasses[idx as usize].unwrap();
-                let power_card: Result<_> = CARDS.hero_power_cards(hero_class).map_err(|e| e.into());
-                let power_card = *try!(power_card).first().unwrap();
+    // let hero_class =
+    // self.config.player_heroclasses[idx as usize].unwrap();
+    //             let power_card: Result<_> = CARDS.hero_power_cards(hero_class).map_err(|e| e.into());
+    // let power_card =
+    // *try!(power_card).first().unwrap();
 
 
-                // Can't fail.
-                let hero_power = self.init_entity::<HeroPower>(power_card).unwrap();
+    //             // Can't fail.
+    // let hero_power =
+    // self.init_entity::<HeroPower>(power_card).unwrap();
 
-                // SET DEFAULT HERO_POWER TAGS
-                hero_power.set_native_tag_value(EGameTags::Controller, player_idx);
-                hero_power.set_native_tag_value(EGameTags::Zone, EZones::Play as u32);
-            }
-        }
+    //             // SET DEFAULT HERO_POWER TAGS
+    //
+    // hero_power.set_native_tag_value(EGameTags::Controller,
+    // player_idx);
+    //
+    // hero_power.set_native_tag_value(EGameTags::Zone,
+    // EZones::Play as u32);
+    //         }
+    //     }
 
-        Ok(self)
-    }
+    //     Ok(self)
+    // }
 }
 
-impl<'a> IProgram<'a> for GameManager<'a> {
-    fn all_entities(&'a self) -> Box<Iterator<Item = &'a IEntity> + 'a> {
+impl<'px> IProgram<'px> for GameManager<'px> {
+    fn all_entities(&self) -> Iter<Box<IEntity<'px> + 'px>> {
         // Nightly supports -> impl Iterator<Item....>
         // instead of ->Box<Iterator<Item..>>
-        let it = self.entities.iter()
-            // Pull reference from box (&Box<IEntity> -> &IEntity).
-            .map(|x| x.as_ref());
-
-        Box::new(it)
+        self.entities.iter()
     }
 
-    fn shared_state_mut(&'a mut self) -> &'a mut (ISharedState + 'a) {
+    fn shared_state_mut(&mut self) -> &mut ISharedState<'px> {
         &mut self.shared_state
     }
 

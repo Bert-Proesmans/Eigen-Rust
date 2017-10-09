@@ -1,4 +1,5 @@
-use std::fmt::{Debug, Display};
+use std::fmt;
+use std::slice::Iter;
 
 use contracts::entities::entity::IEntity;
 use contracts::state_machine::method::IMethod;
@@ -14,12 +15,12 @@ use enums::{EExecutionStates, EGameSteps};
 /// and is responsible for executing the dynamic effects
 /// (which are represented
 /// by the IMethod trait).
-pub trait IProgram<'program>: Debug + Display {
+pub trait IProgram<'program>: fmt::Debug + fmt::Display {
     /// Returns all created entities for the attached game
-    fn all_entities(&self) -> Box<Iterator<Item = &(IEntity + 'program)> + 'program>;
+    fn all_entities(&self) -> Iter<Box<IEntity<'program> + 'program>>;
 
     /// Returns the mutable shared state of this program
-    fn shared_state_mut(&mut self) -> &mut (ISharedState<'program> + 'program);
+    fn shared_state_mut(&mut self) -> &mut ISharedState<'program>;
 
     /// Process the next queued method
     fn process_next(&mut self) -> EExecutionStates;
