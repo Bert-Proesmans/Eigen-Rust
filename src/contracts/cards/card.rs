@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fmt;
+use std::slice::Iter;
 
 use num_traits::FromPrimitive;
 
@@ -8,26 +9,24 @@ use contracts::effects::card_effect::ICardEffect;
 use enums::{ECardClasses, ECardSets, ECardTypes, EGameTags, ERarities};
 
 /// Representation of a card in the game
-pub trait ICard<'card>: fmt::Debug + fmt::Display + Sync {
+pub trait ICard: fmt::Debug + fmt::Display + Sync {
     /// Returns Unique Identifier #1; the database ID of
     /// the card
     fn dbf_id(&self) -> u32;
 
     /// Returns Unique Identifier #2; the stringified ID of
     /// the card
-    fn card_id(&self) -> &'card str;
+    fn card_id(&self) -> &str;
 
     /// Returns the name of the card
-    fn name(&self) -> &'card str;
+    fn name(&self) -> &str;
 
     /// Returns a map of properties assigned to this card
     fn _get_data_internal(&self) -> &HashMap<EGameTags, u32>;
 
     /// Returns the list of effects caused by interacting
     /// with this card
-    // +'static -> underlying object is NOT a reference (which
-    // typically has a lower lifetime duration).
-    fn effects(&self) -> Option<&Vec<Box<ICardEffect<'card> + 'card>>>;
+    fn effects(&self) -> Option<Iter<Box<ICardEffect>>>;
 
     /// Returns a boolean indicating if this card has
     /// implemented effects
@@ -41,11 +40,7 @@ pub trait ICard<'card>: fmt::Debug + fmt::Display + Sync {
     /// If self.effects() returns Some([empty vec]) this
     /// method returns false.
     fn has_implemented_effects(&self) -> bool {
-        if let Some(effects_vec) = self.effects() {
-            return effects_vec.len() > 0;
-        }
-
-        true
+        self.tag_value(EGameTags::Implemented) > 0
     }
 
     /// Returns the value for the requested property within

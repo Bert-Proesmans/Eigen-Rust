@@ -19,7 +19,7 @@ pub trait IEntity<'entity>: fmt::Debug + fmt::Display {
     // this entity!
 
     /// The card used to build this entity object
-    fn reference_card(&self) -> &ICard<'entity>;
+    fn reference_card(&self) -> &(ICard + 'entity);
 
     /// Returns a borrow of the internal state of this
     /// object

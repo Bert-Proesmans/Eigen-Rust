@@ -12,19 +12,19 @@ use enums::{EActivationRequirements, EActivationTargets};
 /// The actual object influencing the game state can be
 /// found
 /// under `effect_code`
-pub trait ICardEffect<'effect>
+pub trait ICardEffect
     : fmt::Debug + fmt::Display + Sync {
     fn activation_target(&self) -> EActivationTargets;
     fn activation_requirement(&self) -> EActivationRequirements;
     fn remove_after_activation(&self) -> bool;
 
-    fn effect_code(&self) -> &Option<Box<IMethod + 'effect>>;
+    fn effect_code(&self) -> Option<&IMethod>;
 
-    fn activate<'g, 'e: 'g>(
+    fn activate(
         &mut self,
-        state: &'g mut IProgram,
-        controller: &'e mut IEntity,
-        source: &'e mut IPlayable,
-        target: Option<&'e mut IPlayable<'e>>,
+        state: &mut IProgram,
+        controller: &mut IEntity,
+        source: &mut IPlayable,
+        target: Option<&mut IPlayable>,
     );
 }

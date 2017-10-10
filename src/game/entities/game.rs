@@ -17,7 +17,7 @@ use enums::{EGameTags, EZones};
 #[derive(Debug)]
 pub struct Game<'game> {
     data: EntityData,
-    card: &'game ICard<'game>
+    card: &'game (ICard + 'game)
 }
 
 impl<'gx> fmt::Display for Game<'gx> {
@@ -30,7 +30,7 @@ impl<'gx> fmt::Display for Game<'gx> {
 }
 
 impl<'ex> IEntity<'ex> for Game<'ex> {
-    fn reference_card(&self) -> &ICard<'ex> {
+    fn reference_card(&self) -> &(ICard + 'ex) {
         self.card
     }
 
@@ -95,11 +95,9 @@ impl<'gx> Game<'gx> {
         // Push additional entity information for this game
         game_entity_data.set_tag(EGameTags::Zone, EZones::Play as u32);
 
-        (&*GAME_CARD).DoFunc();
-
         Ok(Self {
             data: game_entity_data,
-            card: &*GAME_CARD
+            card: &*GAME_CARD,
         })
     }
 }

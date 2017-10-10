@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt;
+use std::slice::Iter;
 
 use contracts::cards::card::ICard;
 use contracts::effects::card_effect::ICardEffect;
@@ -10,8 +11,8 @@ use enums::{ECardSets, ECardTypes, EGameTags, EPlayRequirements};
 #[derive(Debug, Default)]
 pub struct Card<'card> {
     dbf_id: u32,
-    card_id: &'static str,
-    pub name: &'static str,
+    card_id: &'card str,
+    pub name: &'card str,
 
     // Card specifics; need hardcoding during construction!
     pub kind: ECardTypes,
@@ -22,10 +23,10 @@ pub struct Card<'card> {
     // TODO; Add more explicit card properties!
     //
     // Some cards need the following fields implemented.
-    pub entourage: Option<Vec<&'static str>>,
+    pub entourage: Option<Vec<&'card str>>,
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
     pub reference_tags: Option<HashSet<EGameTags>>,
-    pub effects: Option<Vec<Box<ICardEffect<'card> + 'card>>>,
+    pub effects: Option<Vec<Box<ICardEffect>>>,
     pub card_data: HashMap<EGameTags, u32>
 }
 
@@ -36,7 +37,7 @@ unsafe impl<'cx> Sync for Card<'cx> {}
 impl<'cx> Card<'cx> {
     pub fn new(
         dbf_id: u32,
-        card_id: &'static str,
+        card_id: &'cx str,
     ) -> Self {
         Self {
             dbf_id: dbf_id,
@@ -108,16 +109,16 @@ impl<'cx> fmt::Display for Card<'cx> {
 }
 
 
-impl<'cx> ICard<'cx> for Card<'cx> {
+impl<'cx> ICard for Card<'cx> {
     fn dbf_id(&self) -> u32 {
         self.dbf_id
     }
 
-    fn card_id(&self) -> &'static str {
+    fn card_id(&self) -> &str {
         self.card_id
     }
 
-    fn name(&self) -> &'static str {
+    fn name(&self) -> &str {
         self.name
     }
 
@@ -125,7 +126,11 @@ impl<'cx> ICard<'cx> for Card<'cx> {
         &self.card_data
     }
 
-    fn effects(&self) -> Option<&Vec<Box<ICardEffect<'cx> + 'cx>>> {
-        self.effects.as_ref()
+    fn effects(&self) -> Option<Iter<Box<ICardEffect>>> {
+        if let Some(ref effects) = self.effects {
+            return Some(effects.iter());
+        }
+
+        None
     }
 }

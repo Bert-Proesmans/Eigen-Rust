@@ -51,7 +51,7 @@ use self::errors::*;
 
 #[derive(Debug)]
 pub struct GameManager<'program> {
-    config: GameConfig,
+    config: GameConfig<'program>,
     logger: slog::Logger,
 
     entities: Vec<Box<IEntity<'program> + 'program>>,
@@ -76,7 +76,7 @@ impl<'px> fmt::Display for GameManager<'px> {
 
 impl<'px> GameManager<'px> {
     pub fn new<L: Into<Option<slog::Logger>>>(
-        config: GameConfig,
+        config: GameConfig<'px>,
         logger: L,
     ) -> Result<Self> {
         // Test configuration

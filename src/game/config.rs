@@ -10,20 +10,20 @@ pub const MAX_ENTITIES_IN_DECKZONE: usize = 120;
 
 // Make sure this struct always AUTO-DERIVES CLONE!
 #[derive(Debug, Default)]
-pub struct GameConfig {
+pub struct GameConfig<'cfg> {
     pub game_format: Option<EFormats>,
     pub starting_player_idx: u32, // Defaults to 1 (player 1)
 
     // Player data
     // The amount of players must match MAX_PLAYERS constant.
     //
-    pub player_names: [&'static str; MAX_PLAYERS as usize],
+    pub player_names: [&'cfg str; MAX_PLAYERS as usize],
 
     pub player_heroclasses: [Option<ECardClasses>; MAX_PLAYERS as usize],
 
     // It's not possible to have an array of vectors.. or an array of a large amount of cards.
     // This is a serious limitation so we have to fall back to a vector of vectors..
-    pub player_decks: Vec<Option<Vec<&'static ICard<'static>>>>,
+    pub player_decks: Vec<Option<Vec<&'cfg ICard>>>,
 
     pub fill_decks: bool,
     pub shuffle: bool,
@@ -35,7 +35,7 @@ pub struct GameConfig {
     pub max_entities_in_deck: usize
 }
 
-impl GameConfig {
+impl<'cfgx> GameConfig<'cfgx> {
     pub fn new() -> Self {
         Self {
             game_format: None,

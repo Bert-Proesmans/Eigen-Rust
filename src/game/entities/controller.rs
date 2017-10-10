@@ -19,8 +19,8 @@ use enums::{ECardTypes, EGameTags};
 #[derive(Debug)]
 pub struct Controller<'controller> {
     data: EntityData,
-    card: &'controller ICard<'controller>,
-    name: &'static str,
+    card: &'controller (ICard + 'controller),
+    name: &'controller str,
 
     // TODO
     zones: u32,
@@ -39,7 +39,7 @@ impl<'cx> fmt::Display for Controller<'cx> {
 impl<'cx> Controller<'cx> {
     pub fn new(
         id: u32,
-        name: &'static str,
+        name: &'cx str,
     ) -> EntityError::Result<Self> {
 
         let controller_entity_data: EntityError::Result<_> = EntityData::from_data(id, &CONTROLLER_CARD.card_data)
@@ -58,7 +58,7 @@ impl<'cx> Controller<'cx> {
 }
 
 impl<'cx> IEntity<'cx> for Controller<'cx> {
-    fn reference_card(&self) -> &ICard<'cx> {
+    fn reference_card(&self) -> &(ICard + 'cx) {
         self.card
     }
 
