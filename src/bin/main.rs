@@ -5,6 +5,7 @@ extern crate slog_json;
 extern crate slog_async;
 extern crate chrono;
 
+#[macro_use]
 extern crate eigen_rust;
 
 use std::fs::File;
@@ -62,11 +63,10 @@ fn main() {
                         "config" => format!("{:?}", config));
 
     // Setup game.
-    let mut game = GameManager::new(config, root_logger);
+    let mut game = GameManager::new(config, root_logger).log_unwrap(&root_logger);
     game.start();
 
-
-    let task = EndTurn(FIRST_PLAYER);
+    let task = EndTurn!(PLAYER_ONE);
     game.process(task);
 
     // Force an end to the game.

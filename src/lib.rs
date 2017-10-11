@@ -36,7 +36,8 @@ mod cards;
 mod card_sets;
 mod game_manager;
 mod game;
-mod state_machine;
+pub mod state_machine;
+pub mod operations;
 
 // mod effects;
 
@@ -44,17 +45,21 @@ pub mod prelude {
     // This module will re-export all important types and
     // traits.
 
+    pub use errors::*;
+
     // All contracts are put in the prelude to be able to use
     // their defined methods everywhere.
-
     pub use contracts::*;
+
+    pub use cards::card_container::CARDS;
 
     pub use game::config::GameConfig;
     pub use game_manager::GameManager;
 
-    pub use cards::card_container::CARDS;
-
-    pub use errors::*;
+    // Declarations and constants
+    use enums::EControllers;
+    pub const PLAYER_ONE: EControllers = EControllers::ControllerOne;
+    pub const PLAYER_TWO: EControllers = EControllers::ControllerTwo;
 }
 
 

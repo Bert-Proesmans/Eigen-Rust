@@ -88,3 +88,97 @@ macro_rules! register_result_type {
         }
     };
 }
+
+macro_rules! method_impl_gen {
+    // Assign an index to all passed arguments.
+    (@count $name:ident; $count:expr,; $($idx:expr => $generic:ident),*) => {
+        method_impl_gen!(@build $name; $($idx => $generic),*);
+    };
+
+    (@count $name:ident; $count:expr, $head:ident, $($tail:ident),*; $($idx:expr => $generic:ident),*) => {
+        method_impl_gen!(@count $name; $count + 1usize, $($tail),*; $($idx => $generic,)* $count => $head);
+    };
+
+    // Create implementation.
+    (@build $StructName:ident; $($idx:expr => $generic:ident),*) => {
+        #[derive(Debug)]
+        pub struct $StructName<F, $($generic,)*>
+            where
+            // P: IProgram<'p> + 'p,
+            // for <'r> F: Fn(&'r mut P) -> EExecutionStates + fmt::Debug
+            F: Fn(&mut IProgram, ($($generic,)*)) -> EExecutionStates + fmt::Debug,
+        {
+                method: F,
+                last_state: EExecutionStates,
+                args: ($($generic),*),
+                // phantom: PhantomData<&'p P>,
+        }
+
+        impl<F, $($generic,)*> $StructName<F, $($generic,)*>
+            where
+            // P: IProgram<'p> + 'p,
+            // for <'r> F: Fn(&'r mut P) -> EExecutionStates + fmt::Debug
+            F: Fn(&mut IProgram, ($($generic,)*)) -> EExecutionStates + fmt::Debug,
+        {
+            pub fn construct(method: F, args: ($($generic),*) ) -> Result<Self, String> {
+                Ok(Self {
+                    method: method,
+                    last_state: EExecutionStates::Invalid,
+                    args: args,
+                    // phantom: PhantomData,
+                })
+            }
+        }
+
+        impl<F, $($generic,)*> IMethod for $StructName<F, $($generic,)*>
+            where
+            // P: IProgram<'p> + 'p,
+            // for <'r> F: Fn(&'r mut P) -> EExecutionStates + fmt::Debug
+            F: Fn(&mut IProgram, ($($generic,)*)) -> EExecutionStates  + fmt::Debug,
+        {
+            /// Returns the state value of this method object
+            fn state(&self) -> EExecutionStates {
+                self.last_state
+            }
+
+            /// Run the code held by this method object
+            fn run(
+                &mut self,
+                state: &mut IProgram,
+            ) -> EExecutionStates {
+                match self.last_state {
+                    EExecutionStates::Finished => (),
+                    EExecutionStates::Abort => (),
+                    _ => self.last_state = (self.method)(state, self.args),
+                };
+
+                self.last_state
+            }
+        }
+
+        impl<F, $($generic,)*> fmt::Display for $StructName<F, $($generic,)*>
+            where
+            // P: IProgram<'p> + 'p,
+            // for <'r> F: Fn(&'r mut P) -> EExecutionStates + fmt::Debug
+            F: Fn(&mut IProgram, ($($generic,)*)) -> EExecutionStates + fmt::Debug,
+        {
+            fn fmt(
+                &self,
+                f: &mut fmt::Formatter,
+            ) -> fmt::Result {
+                write!(f, "METHOD [TODO]")
+            }
+        }
+    };
+
+    ($name:ident; $($Arg: ident,)+) => {
+        method_impl_gen!($name; $($Arg),+);
+    };
+
+    // This includes the empty clause!
+    ($name:ident; $($Arg: ident),*) => {
+       // Assign an index to each argument.
+       // At the end of the process the implementations will be built.
+       method_impl_gen!(@count $name; 0usize, $($Arg,)*;);
+    };
+}

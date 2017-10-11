@@ -6,6 +6,10 @@ use contracts::cards::card::ICard;
 use contracts::effects::card_effect::ICardEffect;
 // use contracts::cards::errors::*;
 
+// use effects::card_effect::CardEffect;
+
+use game_manager::GameManager;
+
 use enums::{ECardSets, ECardTypes, EGameTags, EPlayRequirements};
 
 #[derive(Debug, Default)]
@@ -26,8 +30,9 @@ pub struct Card<'card> {
     pub entourage: Option<Vec<&'card str>>,
     pub play_requirements: Option<HashMap<EPlayRequirements, u32>>,
     pub reference_tags: Option<HashSet<EGameTags>>,
+    // TODO; Change to ICardEffect
     pub effects: Option<Vec<Box<ICardEffect>>>,
-    pub card_data: HashMap<EGameTags, u32>
+    pub card_data: HashMap<EGameTags, u32>,
 }
 
 // Force implement the Sync trait since we guarantee

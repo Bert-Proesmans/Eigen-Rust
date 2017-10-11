@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum EActivationRequirements {
     /// No requirement, always activates
     NoReq,
@@ -23,7 +23,7 @@ pub enum EActivationRequirements {
     SecretOrQuest
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum EExecutionStates {
     Invalid,
     Ready,
@@ -33,7 +33,7 @@ pub enum EExecutionStates {
     Abort
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum EActivationTargets {
     NoTarget,
     Target,

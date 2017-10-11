@@ -6,6 +6,8 @@ use contracts::entities::playable::IPlayable;
 use contracts::state_machine::program::IProgram;
 use contracts::state_machine::method::IMethod;
 
+use game_manager::{GameManagerMethod, GameManager};
+
 use state_machine::shared_state::{REG_EID_ONE, REG_EID_TWO, REG_EID_THREE};
 
 pub const EID_SOURCE: u32 = REG_EID_ONE;
@@ -19,7 +21,7 @@ pub struct CardEffect {
     activation_target: EActivationTargets,
     activation_requirement: EActivationRequirements,
     remove_after_activation: bool,
-    effect: Option<Box<IMethod>>
+    effect: Option<GameManagerMethod<'static>>
 }
 
 impl fmt::Display for CardEffect {
@@ -33,7 +35,7 @@ impl fmt::Display for CardEffect {
 
 unsafe impl Sync for CardEffect {}
 
-impl ICardEffect for CardEffect {
+impl<'px> ICardEffect<'px, GameManager<'px>> for CardEffect {
     fn activation_target(&self) -> EActivationTargets {
         self.activation_target
     }
@@ -46,7 +48,7 @@ impl ICardEffect for CardEffect {
         self.remove_after_activation
     }
 
-    fn effect_code<'e>(&'e self) -> &'e Option<Box<IMethod + 'static>> {
+    fn effect_code<'e>(&'e self) -> Option<&GameManagerMethod<'static>>> {
         &self.effect
     }
 
