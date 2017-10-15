@@ -49,6 +49,7 @@ pub mod prelude {
 
     // All contracts are put in the prelude to be able to use
     // their defined methods everywhere.
+
     pub use contracts::*;
 
     pub use cards::card_container::CARDS;
@@ -57,6 +58,7 @@ pub mod prelude {
     pub use game_manager::GameManager;
 
     // Declarations and constants
+
     use enums::EControllers;
     pub const PLAYER_ONE: EControllers = EControllers::ControllerOne;
     pub const PLAYER_TWO: EControllers = EControllers::ControllerTwo;

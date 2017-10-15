@@ -7,8 +7,7 @@ use enums::ECardClasses;
 use super::errors::*;
 
 /// Container object for statically defined card objects
-pub trait ICardContainer
-    : fmt::Debug + fmt::Display + Sync {
+pub trait ICardContainer: fmt::Debug + fmt::Display + Sync {
     /// Returns the set of all registered card objects,
     /// index by their database ID
     fn all_cards(&self) -> &HashMap<u32, &(ICard + 'static)>;

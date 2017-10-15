@@ -7,8 +7,8 @@ use contracts::cards::errors::Error as CardError;
 // use contracts::entities::errors::Error as EntityError;
 
 
-// use game::errors::Error as GameError;
-// use game_manager::errors::Error as ManagerError;
+use game::errors::Error as GameError;
+use game_manager::errors::Error as ManagerError;
 
 pub trait ResultLogging<T> {
     /// Prints the error chain text to the provided logger.
@@ -31,5 +31,5 @@ register_result_type!(CardError);
 // register_result_type!(EntityError);
 // register_result_type!(CastError);
 
-// register_result_type!(ManagerError);
-// register_result_type!(GameError);
+register_result_type!(ManagerError);
+register_result_type!(GameError);

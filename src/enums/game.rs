@@ -524,5 +524,5 @@ pub enum EGameTags {
     NumMurlocsPlayedThisGame = 1008,
     TagLastKnownPositionOnBoard = 1009, // position aren't changed in graveyard and setaside zone ??? obolet?
 
-    Implemented = 5001,
+    Implemented = 5001
 }

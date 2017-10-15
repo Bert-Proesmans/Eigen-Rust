@@ -16,6 +16,16 @@ use enums::{EExecutionStates, EGameSteps};
 /// (which are represented
 /// by the IMethod trait).
 pub trait IProgram<'program>: fmt::Debug + fmt::Display {
+    /// Type used to identify issues while transitioning
+    /// state.
+    type ProgressStateResult;
+
+    /// Sets the program into the running state.
+    fn start(self) -> self::ProgressStateResult;
+
+    /// Sets the program into the finished state.
+    fn finish(self) -> self::ProgressStateResult;
+
     /// Returns all created entities for the attached game
     fn all_entities(&self) -> Iter<Box<IEntity<'program> + 'program>>;
 

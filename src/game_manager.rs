@@ -39,6 +39,12 @@ pub const GAME_ENTITY_ID: u32 = 1;
 
 pub mod errors {
     error_chain!{
+        errors {
+            InvalidStateRequirement(current: String, requested: String) {
+                display("Impossible to transition from state {} into state {}", current, requested)
+            }
+        }
+
         links {
             InvalidConfig(::game::errors::Error, ::game::errors::ErrorKind);
             EntityCreationFail(::contracts::entities::errors::Error, ::contracts::entities::errors::ErrorKind);
@@ -158,6 +164,16 @@ impl<'px> GameManager<'px> {
         val
     }
 
+    pub fn process(
+        &mut self,
+        operation: Box<IMethod>,
+    ) -> Result<()> {
+        // TODO; Do something with the return value.
+        self.fast_execute(operation);
+
+        Ok(())
+    }
+
     /////////////////////
     // Private methods //
     // //////////////////
@@ -256,6 +272,12 @@ impl<'px> GameManager<'px> {
 }
 
 impl<'px> IProgram<'px> for GameManager<'px> {
+    type ProgressStateResult = Result<Self>;
+
+    fn start(self) -> Result<Self> {}
+
+    fn finish(self) -> Result<Self> {}
+
     fn all_entities(&self) -> Iter<Box<IEntity<'px> + 'px>> {
         // Nightly supports -> impl Iterator<Item....>
         // instead of ->Box<Iterator<Item..>>
@@ -268,15 +290,17 @@ impl<'px> IProgram<'px> for GameManager<'px> {
 
     /// Process the next queued method.
     fn process_next(&mut self) -> EExecutionStates {
-        if self.current_step != EGameSteps::PreGame && self.current_step != EGameSteps::FinalGameOver {
-            if let Some(mut next_method) = self.method_queue.pop_front() {
-                return next_method.run(self);
-            } else {
-                return EExecutionStates::Finished;
+        match self.current_step {
+            EGameSteps::PreGame |
+            EGameSteps::FinalGameOver => EExecutionStates::Invalid,
+            _ => {
+                if let Some(mut next_method) = self.method_queue.pop_front() {
+                    return next_method.run(self);
+                } else {
+                    return EExecutionStates::Finished;
+                }
             }
         }
-
-        return EExecutionStates::Invalid;
     }
 
     /// Instantly execute the provided method within this

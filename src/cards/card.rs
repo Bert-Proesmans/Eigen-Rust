@@ -32,7 +32,7 @@ pub struct Card<'card> {
     pub reference_tags: Option<HashSet<EGameTags>>,
     // TODO; Change to ICardEffect
     pub effects: Option<Vec<Box<ICardEffect>>>,
-    pub card_data: HashMap<EGameTags, u32>,
+    pub card_data: HashMap<EGameTags, u32>
 }
 
 // Force implement the Sync trait since we guarantee

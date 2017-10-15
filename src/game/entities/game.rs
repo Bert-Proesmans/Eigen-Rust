@@ -97,7 +97,7 @@ impl<'gx> Game<'gx> {
 
         Ok(Self {
             data: game_entity_data,
-            card: &*GAME_CARD,
+            card: &*GAME_CARD
         })
     }
 }
