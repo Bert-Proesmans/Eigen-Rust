@@ -1,27 +1,6 @@
 [package]
-name = "eigen_rust"
+name = "Eigen-Rust"
 version = "0.1.0"
 authors = ["Bert Proesmans <bproesmans@hotmail.com>"]
 
 [dependencies]
-# Provides macro's for collection creation.
-maplit = "0.1.4"
-# Allows dynamic allocations (hashmap and others) within static
-# variables through lazy evaluation.
-lazy_static = "0.2"
-# Allows conversion of primitives TO/FROM enum values
-enum-primitive-derive = "^0.1"
-num-traits = "^0.1"
-# Logging tools
-slog = "2.0.10"
-slog-stdlog = "3.0.2"
-slog-term = "2.2.0"
-slog-json = "2.0.2"
-slog-stream = "1.2.1"
-slog-async = "2.1.0"
-# Time handling
-chrono = "0.4.0"
-# Provides map generation at compile time
-phf = "0.7.21"
-# Better error handling
-error-chain = "0.11.0"
