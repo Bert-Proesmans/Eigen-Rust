@@ -4,6 +4,12 @@ pub mod state_machine {
     	#[derive(Debug)]
 		pub struct Invalid {}
 
+		impl Invalid {
+		    pub fn new() -> Self {
+		    	Self {}
+		    }
+		}
+
 		#[derive(Debug)]
 		pub struct Error {}
 
@@ -74,7 +80,7 @@ use state_machine::states;
 #[derive(Debug)]
 enum GameSteps {
     Invalid(GameProcessor<states::Invalid>),
-    Error(GameProcessor<states::Error>),
+    // Error(GameProcessor<states::Error>),
     
     Start(GameProcessor<states::Start>),
     StartShuffle(GameProcessor<states::StartShuffle>),
@@ -95,23 +101,55 @@ enum GameSteps {
     Play(GameProcessor<states::Play>),
     Surrender(GameProcessor<states::Surrender>),
 
-    Trigger,
-    Effect,
-    Death,
-    AuraChange,
-    EntityChange,
+    Processing(ProcessingSteps),
 }
 
+impl GameSteps {
+    // pub fn step(self) -> Self {
+    // 	match self {
+    // 	    GameSteps::Start(val) => GameSteps::StartShuffle(val.into()),
+    // 	    None => expr,
+    // 	}
+    // }
+}
 
+#[derive(Debug)]
+enum ProcessingSteps {
+    Trigger(GameProcessor<states::Trigger>),
+    Effect(GameProcessor<states::Effect>),
+    Death(GameProcessor<states::Death>),
+
+    AuraChange(GameProcessor<states::AuraChange>),
+    EntityChange(GameProcessor<states::EntityChange>),
+}
 
 #[derive(Debug)]
 struct GameProcessor<S> {
-    state_data: S,
+    state: S,
+    entities: u32,   
+    program_state: u32, 
+}
+
+impl GameProcessor<states::Invalid> {
+    pub fn new() -> Self {
+    	Self {
+    		state: states::Invalid::new(),
+    		entities: 0,
+    	}
+    }
 }
 
 #[derive(Debug)]
 struct GameFactory {
-    entities: u32,
+    config: u32,
     processor: GameSteps,
 }
 
+impl GameFactory {
+    pub fn new(config: u32) -> Self {
+    	Self {
+    		config: config,
+    		processor: GameSteps::Invalid(GameProcessor::new()),
+    	}
+    }
+}
