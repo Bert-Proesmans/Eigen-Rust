@@ -1,5 +1,20 @@
+#[macro_use]
+extern crate maplit;
+
+use std::collections::{HashSet,HashMap};
+use std::fmt;
+
+pub mod operations {
+	pub mod play_options {
+		fn end_turn(state: GameProcessor<states::TurnWait>, variables: (u32,)) ->GameProcessor<states:: {
+
+		}
+	}
+}
+
 
 pub mod state_machine {
+
     pub mod states {
     	#[derive(Debug)]
 		pub struct Invalid {}
@@ -65,6 +80,9 @@ pub mod state_machine {
 		pub struct Effect {}
 
 		#[derive(Debug)]
+		pub struct ImmediateEffect {}
+
+		#[derive(Debug)]
 		pub struct Death {}
 
 		#[derive(Debug)]
@@ -78,14 +96,14 @@ pub mod state_machine {
 use state_machine::states;
 
 #[derive(Debug)]
-enum GameSteps {
+pub enum GameSteps {
     Invalid(GameProcessor<states::Invalid>),
     // Error(GameProcessor<states::Error>),
     
+    Finished(GameProcessor<states::Finished>),
     Start(GameProcessor<states::Start>),
     StartShuffle(GameProcessor<states::StartShuffle>),
     StartDraw(GameProcessor<states::StartDraw>),
-    Finished(GameProcessor<states::Finished>),
     
     Mulligan(GameProcessor<states::Mulligan>),
     MulliganWait(GameProcessor<states::MulliganWait>),
@@ -105,17 +123,19 @@ enum GameSteps {
 }
 
 impl GameSteps {
-    // pub fn step(self) -> Self {
-    // 	match self {
-    // 	    GameSteps::Start(val) => GameSteps::StartShuffle(val.into()),
-    // 	    None => expr,
-    // 	}
-    // }
+    pub fn step(self) -> Self {
+    	match self {
+    		GameSteps::Invalid(val) => GameSteps::Start(val.into()),
+    	    // GameSteps::Start(val) => GameSteps::StartShuffle(val.into()),
+    	    _ => unimplemented!{},
+    	}
+    }
 }
 
 #[derive(Debug)]
-enum ProcessingSteps {
+pub enum ProcessingSteps {
     Trigger(GameProcessor<states::Trigger>),
+    ImmediateEffect(GameProcessor<states::ImmediateEffect>),
     Effect(GameProcessor<states::Effect>),
     Death(GameProcessor<states::Death>),
 
@@ -123,24 +143,60 @@ enum ProcessingSteps {
     EntityChange(GameProcessor<states::EntityChange>),
 }
 
+const NUM_REGISTERS: usize = 6;
+
 #[derive(Debug)]
-struct GameProcessor<S> {
+struct SharedData {
+    playables: HashSet<u32>,
+    card_ids: HashSet<u32>,
+    registers: [i32; NUM_REGISTERS],
+    flags: u32,
+}
+
+impl SharedData {
+    pub fn new() -> Self {
+    	Self {
+    		playables: hashset!{},
+    		card_ids: hashset!{},
+    		registers: [0; NUM_REGISTERS],
+    		flags: 0,
+    	}
+    }
+}
+
+pub trait IEntity: fmt::Debug {
+    // add code here
+}
+
+#[derive(Debug)]
+pub struct GameProcessor<S> {
     state: S,
-    entities: u32,   
-    program_state: u32, 
+    entities: Vec<Box<IEntity>>,   
+    program_state: SharedData, 
 }
 
 impl GameProcessor<states::Invalid> {
     pub fn new() -> Self {
     	Self {
     		state: states::Invalid::new(),
-    		entities: 0,
+    		entities: vec![],
+    		program_state: SharedData::new(),
+    	}
+    }
+}
+
+impl From<GameProcessor<states::Invalid>> for GameProcessor<states::Start> {
+    fn from(val: GameProcessor<states::Invalid>) -> GameProcessor<states::Start> {
+    	GameProcessor {
+    		entities: val.entities,
+    		program_state: val.program_state,
+    		state: states::Start{},
     	}
     }
 }
 
 #[derive(Debug)]
-struct GameFactory {
+pub struct GameFactory {
     config: u32,
     processor: GameSteps,
 }
@@ -151,5 +207,10 @@ impl GameFactory {
     		config: config,
     		processor: GameSteps::Invalid(GameProcessor::new()),
     	}
+    }
+
+    pub fn start_game(self) -> GameSteps {
+    	let invalid_state = self.processor;
+    	return invalid_state.step();
     }
 }
