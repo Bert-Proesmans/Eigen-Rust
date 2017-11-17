@@ -7,7 +7,7 @@ pub(crate) struct SharedData {
     pub(crate) playables: HashSet<u32>,
     pub(crate) card_ids: HashSet<u32>,
     pub(crate) registers: [i32; NUM_REGISTERS],
-    pub(crate) flags: u32,
+    pub(crate) flags: u32
 }
 
 impl SharedData {
@@ -16,7 +16,7 @@ impl SharedData {
             playables: hashset!{},
             card_ids: hashset!{},
             registers: [0; NUM_REGISTERS],
-            flags: 0,
+            flags: 0
         }
     }
 }

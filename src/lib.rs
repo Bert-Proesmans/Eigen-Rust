@@ -10,3 +10,5 @@ pub mod state_machine;
 
 pub mod game;
 pub mod game_tags;
+pub mod game_triggers;
+pub mod game_zones;
