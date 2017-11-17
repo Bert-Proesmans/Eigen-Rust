@@ -1,12 +1,10 @@
 use num_traits::ToPrimitive;
 use std::result;
 
-use entities::core_entities::GAME_ENTITY_ID;
+// use entities::core_entities::GAME_ENTITY_ID;
 use game::GameProcessor;
 use state_machine::core_states;
 use state_machine::trigger_states;
-
-use game_tags::EGameTags;
 
 type Result<A> = result::Result<A, GameProcessor<core_states::Finished>>;
 
@@ -20,12 +18,12 @@ pub const PLAYER_ONE: EController = EController::ControllerOne;
 pub const PLAYER_TWO: EController = EController::ControllerTwo;
 
 pub fn end_turn(
-    mut machine: GameProcessor<core_states::Input>,
+    machine: GameProcessor<core_states::Input>,
     variables: (EController,),
 ) -> Result<GameProcessor<core_states::Input>> {
     // 'machine' is the container of the processing state!
     let (next_player,) = variables;
-    let next_player = next_player.to_u32().expect("Invalid EController value");
+    let _next_player = next_player.to_u32().expect("Invalid EController value");
 
     // {
     // let game_entity =
@@ -48,7 +46,7 @@ pub fn end_turn(
 }
 
 pub fn handle_end_turn_triggers(
-    machine: GameProcessor<core_states::Trigger<trigger_states::EndTurn>>,
+    _machine: GameProcessor<core_states::Trigger<trigger_states::EndTurn>>,
 ) -> Result<GameProcessor<core_states::Neutral>> {
     unimplemented!()
 }

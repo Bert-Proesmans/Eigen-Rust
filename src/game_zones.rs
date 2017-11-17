@@ -1,4 +1,5 @@
 use entities::core_entities::EntityId;
+use game_triggers::StoredTrigger;
 
 #[derive(Debug, PartialEq, Eq, Hash, Primitive)]
 pub enum EZones {
@@ -17,7 +18,7 @@ pub struct GameZone {
     id: EZones,
     owner: EntityId,
     residents: Vec<EntityId>,
-    triggers: Vec<u32>
+    triggers: Vec<StoredTrigger>,
 }
 
 impl GameZone {}

@@ -8,6 +8,9 @@ use state_machine::shared_data::SharedData;
 
 use game_zones;
 
+// Shortcut
+pub type GameTriggerState<T> = GameProcessor<core_states::Trigger<T>>;
+
 #[derive(Debug)]
 pub struct GameFactory {}
 
