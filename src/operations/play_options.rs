@@ -2,20 +2,13 @@ use num_traits::ToPrimitive;
 use std::result;
 
 // use entities::core_entities::GAME_ENTITY_ID;
+
+use entities::core_entities::EController;
 use game::GameProcessor;
 use state_machine::core_states;
 use state_machine::trigger_states;
 
 type Result<A> = result::Result<A, GameProcessor<core_states::Finished>>;
-
-#[derive(Debug, PartialEq, Eq, Primitive)]
-pub enum EController {
-    ControllerOne = 1,
-    ControllerTwo = 2
-}
-
-pub const PLAYER_ONE: EController = EController::ControllerOne;
-pub const PLAYER_TWO: EController = EController::ControllerTwo;
 
 pub fn end_turn(
     machine: GameProcessor<core_states::Input>,

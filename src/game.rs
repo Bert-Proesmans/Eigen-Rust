@@ -2,10 +2,9 @@ use std::boxed::Box;
 
 use entities::core_entities;
 use entities::entity::IEntity;
-
-use state_machine::core_states;
+use game_triggers;
+use state_machine::{core_states, trigger_states, dynamic};
 use state_machine::shared_data::SharedData;
-
 use game_zones;
 
 // Shortcut
@@ -27,9 +26,9 @@ where
 {
     pub(crate) state: S,
     pub(crate) entities: Vec<Box<IEntity>>,
-    pub(crate) zones: Vec<game_zones::GameZone>,
+    pub(crate) zones: game_zones::ZoneContainer,
     pub(crate) program_state: SharedData,
-    pub(crate) triggers: Vec<u32>
+    pub(crate) triggers: game_triggers::TriggerContainer
 }
 
 impl<S> GameProcessor<S>
@@ -59,14 +58,17 @@ impl GameProcessor<core_states::AwaitingStart> {
     pub fn new() -> Result<Self, String> {
 
         let game_entity = try!(core_entities::Game::new());
-
-        Ok(Self {
+        let current_obj = Self {
             state: core_states::AwaitingStart::new(),
             entities: vec![Box::new(game_entity)],
-            zones: vec![],
+            zones: game_zones::ZoneContainer::new(),
             program_state: SharedData::new(),
-            triggers: vec![]
-        })
+            triggers: game_triggers::TriggerContainer::new()
+        };
+
+        let current_obj = try!(current_obj._build_default_triggers());
+
+        Ok(current_obj)
     }
 
     fn _setup_game(self) -> Result<Self, String> {
@@ -83,4 +85,19 @@ impl GameProcessor<core_states::AwaitingStart> {
         // TODO
         Ok(self)
     }
+
+    fn _build_default_triggers(self) -> Result<Self, String> {   
+        let endTurnTrigger = game_triggers::TriggerBuilder::default()
+                            .effect(dynamic::MethodTrigger::new(self::_test))
+                            .build()
+                            .unwrap();
+        self.triggers.game_global.append(endTurnTrigger);
+
+
+        Ok(self)
+    }
 }
+
+fn _test(_machine: GameTriggerState<trigger_states::EndTurn>) -> Result<GameTriggerState<trigger_states::EndTurn>, dynamic::EExecutionStates> {
+        unimplemented!()
+    }

@@ -1,4 +1,6 @@
-use entities::core_entities::EntityId;
+use std::collections::HashMap;
+
+use entities::core_entities::{EController, EntityId};
 use game_triggers::StoredTrigger;
 
 #[derive(Debug, PartialEq, Eq, Hash, Primitive)]
@@ -14,11 +16,22 @@ pub enum EZones {
 }
 
 #[derive(Debug)]
+pub struct ZoneContainer {
+    zones: HashMap<(EController, EZones), GameZone>
+}
+
+impl ZoneContainer {
+    pub fn new() -> Self {
+        Self { zones: hashmap!{} }
+    }
+}
+
+#[derive(Debug)]
 pub struct GameZone {
     id: EZones,
     owner: EntityId,
     residents: Vec<EntityId>,
-    triggers: Vec<StoredTrigger>,
+    triggers: Vec<StoredTrigger>
 }
 
 impl GameZone {}

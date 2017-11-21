@@ -1,24 +1,34 @@
-use std::marker::PhantomData;
-
 use game::GameTriggerState;
 use state_machine::trigger_states;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EExecutionStates {
     Invalid,
     Waiting,
     Running,
+    Aborted,
     Finished,
-    Aborted
 }
 
-#[derive(Debug)]
-pub struct Method<T, F>
+type GameTriggerDelegate<T> = fn(GameTriggerState<T>) -> Result<GameTriggerState<T>, EExecutionStates>;
+
+#[derive(Debug, Clone)]
+pub struct MethodTrigger<T>
 where
     T: trigger_states::TriggerState,
-    F: Fn(&mut GameTriggerState<T>) -> EExecutionStates
 {
     pub(crate) last_state: EExecutionStates,
-    pub(crate) delegate: F,
-    phantom: PhantomData<T>,
+    pub(crate) delegate: GameTriggerDelegate<T>,
+}
+
+impl<T> MethodTrigger<T> 
+where
+    T: trigger_states::TriggerState,
+{
+    pub fn new(delegate: GameTriggerDelegate<T>) -> Self {
+        Self {
+            last_state: EExecutionStates::Waiting,
+            delegate: delegate,
+        }
+    }
 }

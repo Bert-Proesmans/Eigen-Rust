@@ -10,58 +10,58 @@ pub enum ETriggerState {
     EndTurn
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct StartGame {}
 impl TriggerState for StartGame {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct EndGame {}
 impl TriggerState for EndGame {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct StartTurn {}
 impl TriggerState for StartTurn {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct EndTurn {}
 impl TriggerState for EndTurn {}
 
 // **********
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ZoneChange {}
 impl TriggerState for ZoneChange {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Concede {}
 impl TriggerState for Concede {}
 
 // **********
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Shuffle {}
 impl TriggerState for Shuffle {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Mulligan {}
 impl TriggerState for Mulligan {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct MulliganWait {}
 impl TriggerState for MulliganWait {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Resource {}
 impl TriggerState for Resource {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Draw {}
 impl TriggerState for Draw {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Death {}
 impl TriggerState for Death {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TagChange {}
 impl TriggerState for TagChange {}

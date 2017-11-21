@@ -2,9 +2,10 @@
 extern crate eigen_rust;
 
 use eigen_rust::game::{GameFactory, GameProcessor};
-use eigen_rust::operations::play_options::{PLAYER_ONE, PLAYER_TWO};
+use eigen_rust::entities::core_entities::{PLAYER_ONE, PLAYER_TWO};
 use eigen_rust::state_machine::core_states;
 use eigen_rust::state_machine::trigger_states;
+use eigen_rust::game_triggers;
 
 fn main() {
     let game = GameFactory::new(0u32).unwrap();
