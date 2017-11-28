@@ -8,7 +8,7 @@ use eigen_rust::state_machine::trigger_states;
 use eigen_rust::game_triggers;
 
 fn main() {
-    let game = GameFactory::new(0u32).unwrap();
+    let game = GameFactory::new(0u32).expect("Couldn't build a new game");
 
     // Start the game.
     let game: GameProcessor<core_states::Trigger<trigger_states::StartGame>> = game.into();
@@ -26,11 +26,11 @@ fn main() {
         panic!("Unexpected game end!");
     }
 
-    let task = EndTurn!(PLAYER_TWO);
-    let game = (task)(game.unwrap());
-    if game.is_err() {
-        panic!("Unexpected game end!");
-    }
+    // let task = EndTurn!(PLAYER_TWO);
+    // let game = (task)(game.unwrap());
+    // if game.is_err() {
+    //     panic!("Unexpected game end!");
+    // }
 
     // let task = Concede!(PLAYER_ONE);
     // let game = (task)(game);

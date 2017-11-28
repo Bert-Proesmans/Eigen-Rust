@@ -86,18 +86,17 @@ impl GameProcessor<core_states::AwaitingStart> {
         Ok(self)
     }
 
-    fn _build_default_triggers(self) -> Result<Self, String> {   
-        let endTurnTrigger = game_triggers::TriggerBuilder::default()
+    fn _build_default_triggers(mut self) -> Result<Self, String> {   
+        let end_turn_trigger = game_triggers::TriggerBuilder::default()
                             .effect(dynamic::MethodTrigger::new(self::_test))
                             .build()
                             .unwrap();
-        self.triggers.game_global.append(endTurnTrigger);
-
-
+        self.triggers.store_global_trigger(Box::new(end_turn_trigger));
         Ok(self)
     }
 }
 
 fn _test(_machine: GameTriggerState<trigger_states::EndTurn>) -> Result<GameTriggerState<trigger_states::EndTurn>, dynamic::EExecutionStates> {
-        unimplemented!()
+        println!("EndOfTurn trigger");
+        Ok(_machine)
     }

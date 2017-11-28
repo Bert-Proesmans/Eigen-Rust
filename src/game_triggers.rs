@@ -23,7 +23,8 @@ impl TriggerContainer {
     }
 
     pub fn store_global_trigger(&mut self, trigger: Box<ITrigger>) {
-        unimplemented!()
+        let trigger_wrapper = StoredTrigger::Actual(trigger);
+        self.game_global.push(trigger_wrapper);
     }
 }
 
@@ -41,9 +42,11 @@ pub struct Trigger<T>
 where
     T: trigger_states::TriggerState,
 {
-    pub(crate) source: EntityId,
+    #[builder(default)]
+    pub(crate) source: Option<EntityId>,
     pub(crate) effect: MethodTrigger<T>,
-    pub(crate) number_of_runs: u32
+    #[builder(setter(skip))]
+    pub(crate) number_of_runs: u32,
 }
 
 impl<T> ITrigger for Trigger<T>
