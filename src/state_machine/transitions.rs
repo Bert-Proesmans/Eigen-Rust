@@ -1,190 +1,120 @@
-use game::GameProcessor;
-use state_machine::{core_states, trigger_states};
+use game::GameMachine;
+use state_machine::{action_states, core_states, trigger_states, wait_states};
 
-// Source: trigger_states::Effect
+// Generic transitions
 
-impl From<GameProcessor<core_states::Effect>> for GameProcessor<core_states::Death> {
-    fn from(old: GameProcessor<core_states::Effect>) -> Self {
-        GameProcessor {
-            state: core_states::Death {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Trigger<X> -> Effect<X>
+impl<T> From<GameMachine<core_states::Trigger<T>>> for GameMachine<core_states::Effect<T>>
+where
+    T: core_states::StateTriggerable
+        + Default,
+{
+    fn from(old: GameMachine<core_states::Trigger<T>>) -> Self {
+        GameMachine { state: core_states::Effect::<T>::default() }
     }
 }
 
-// Source: trigger_states::Death
-
-impl From<GameProcessor<core_states::Death>> for GameProcessor<core_states::Trigger<trigger_states::Death>> {
-    fn from(old: GameProcessor<core_states::Death>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::Death {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Effect<X> -> Trigger<X/Y/Z>
+impl<T,Y> From<GameMachine<core_states::Effect<T>>> for
+		GameMachine<core_states::Trigger<Y>>
+where
+	T: core_states::StateTriggerable + Default,
+	Y: core_states::StateTriggerable + Default
+{
+    fn from(old: GameMachine<core_states::Effect<T>>) -> Self {
+    	GameMachine {
+    		state: core_states::Trigger::<Y>::default(),
+    	}
     }
 }
 
-impl From<GameProcessor<core_states::Death>> for GameProcessor<core_states::Trigger<trigger_states::EndGame>> {
-    fn from(old: GameProcessor<core_states::Death>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::EndGame {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Effect<X> -> PostTrigger<X>
+impl<T> From<GameMachine<core_states::Effect<T>>> for
+		GameMachine<core_states::PostTrigger<T>>
+where
+	T: core_states::StateTriggerable + Default
+{
+    fn from(old: GameMachine<core_states::Effect<T>>) -> Self {
+    	GameMachine {
+    		state: core_states::PostTrigger::<T>::default(),
+    	}
     }
 }
 
-impl From<GameProcessor<core_states::Death>> for GameProcessor<core_states::Neutral> {
-    fn from(old: GameProcessor<core_states::Death>) -> Self {
-        GameProcessor {
-            state: core_states::Neutral {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Effect<X> -> Death<X>
+impl<T> From<GameMachine<core_states::Effect<T>>> for GameMachine<core_states::Death<T>>
+where
+    T: core_states::StateTriggerable
+        + Default,
+{
+    fn from(old: GameMachine<core_states::Effect<T>>) -> Self {
+        GameMachine { state: core_states::Death::<T>::default() }
     }
 }
 
-// Source: trigger_states::Neutral
+// Explicit transitions
 
-impl From<GameProcessor<core_states::Neutral>> for GameProcessor<core_states::Input> {
-    fn from(old: GameProcessor<core_states::Neutral>) -> Self {
-        GameProcessor {
-            state: core_states::Input {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Wait<Start> -> Action<StartGame>
+// impl From<GameMachine<core_states::Wait<wait_states::
+// Start>>> for
+// GameMachine<core_states::Action<action_states::
+// StartGame>>
+// {
+// fn from(old:
+// GameMachine<core_states::Wait<wait_states::Start>>) ->
+// Self {
+//     	GameMachine {
+// state:
+// core_states::Action::<action_states::StartGame>::
+// default(),
+//     	}
+//     }
+// }
+
+// DBG; Wait<Start> -> Wait<Input>
+impl From<GameMachine<core_states::Wait<wait_states::Start>>> for GameMachine<core_states::Wait<wait_states::Input>> {
+    fn from(old: GameMachine<core_states::Wait<wait_states::Start>>) -> Self {
+        GameMachine { state: core_states::Wait::<wait_states::Input>::default() }
     }
 }
 
-// Source: core_states::AwaitingStart
-
-impl From<GameProcessor<core_states::AwaitingStart>>
-    for GameProcessor<core_states::Trigger<trigger_states::StartGame>> {
-    fn from(old: GameProcessor<core_states::AwaitingStart>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::StartGame {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Wait<Input> -> Action<EndTurn>
+impl From<GameMachine<core_states::Wait<wait_states::Input>>>
+    for GameMachine<core_states::Action<action_states::EndTurn>> {
+    fn from(old: GameMachine<core_states::Wait<wait_states::Input>>) -> Self {
+        GameMachine { state: core_states::Action::<action_states::EndTurn>::default() }
     }
 }
 
-// Source: trigger_states::StartGame
 
-impl From<GameProcessor<core_states::Trigger<trigger_states::StartGame>>> for GameProcessor<core_states::Effect> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::StartGame>>) -> Self {
-        GameProcessor {
-            state: core_states::Effect {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// PostAction<EndTurn> -> WaitInput
+impl From<GameMachine<core_states::PostAction<action_states::EndTurn>>>
+    for GameMachine<core_states::Wait<wait_states::Input>> {
+    fn from(old: GameMachine<core_states::PostAction<action_states::EndTurn>>) -> Self {
+        GameMachine { state: core_states::Wait::<wait_states::Input>::default() }
     }
 }
 
-impl From<GameProcessor<core_states::Trigger<trigger_states::StartGame>>> for GameProcessor<core_states::Input> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::StartGame>>) -> Self {
-        GameProcessor {
-            state: core_states::Input {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Action<EndTurn> -> Trigger<EndTurn>
+impl From<GameMachine<core_states::Action<action_states::EndTurn>>>
+    for GameMachine<core_states::Trigger<trigger_states::EndTurn>> {
+    fn from(old: GameMachine<core_states::Action<action_states::EndTurn>>) -> Self {
+        GameMachine { state: core_states::Trigger::<trigger_states::EndTurn>::default() }
     }
 }
 
-impl From<GameProcessor<core_states::Trigger<trigger_states::StartGame>>>
-    for GameProcessor<core_states::Trigger<trigger_states::MulliganWait>> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::StartGame>>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::MulliganWait {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Death<EndTurn> -> Trigger<StartTurn>
+impl From<GameMachine<core_states::Death<trigger_states::EndTurn>>>
+    for GameMachine<core_states::Trigger<trigger_states::StartTurn>> {
+    fn from(old: GameMachine<core_states::Death<trigger_states::EndTurn>>) -> Self {
+        GameMachine { state: core_states::Trigger::<trigger_states::StartTurn>::default() }
     }
 }
 
-// Source: trigger_states::Input
-
-impl From<GameProcessor<core_states::Input>> for GameProcessor<core_states::Trigger<trigger_states::Concede>> {
-    fn from(old: GameProcessor<core_states::Input>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::Concede {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
-    }
-}
-
-impl From<GameProcessor<core_states::Input>> for GameProcessor<core_states::Trigger<trigger_states::EndTurn>> {
-    fn from(old: GameProcessor<core_states::Input>) -> Self {
-        GameProcessor {
-            state: core_states::Trigger { internal: trigger_states::EndTurn {} },
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
-    }
-}
-
-// Source: trigger_states::Concede
-
-impl From<GameProcessor<core_states::Trigger<trigger_states::Concede>>> for GameProcessor<core_states::Effect> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::Concede>>) -> Self {
-        GameProcessor {
-            state: core_states::Effect {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
-    }
-}
-
-// Source: trigger_states::EndTurn
-
-impl From<GameProcessor<core_states::Trigger<trigger_states::EndTurn>>> for GameProcessor<core_states::Effect> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::EndTurn>>) -> Self {
-        GameProcessor {
-            state: core_states::Effect {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
-    }
-}
-
-// Source: trigger_states::Death
-
-impl From<GameProcessor<core_states::Trigger<trigger_states::Death>>> for GameProcessor<core_states::Effect> {
-    fn from(old: GameProcessor<core_states::Trigger<trigger_states::Death>>) -> Self {
-        GameProcessor {
-            state: core_states::Effect {},
-            entities: old.entities,
-            program_state: old.program_state,
-            zones: old.zones,
-            triggers: old.triggers
-        }
+// Death<StartTurn> -> PostAction<EndTurn>
+impl From<GameMachine<core_states::Death<trigger_states::StartTurn>>>
+    for GameMachine<core_states::PostAction<action_states::EndTurn>> {
+    fn from(old: GameMachine<core_states::Death<trigger_states::StartTurn>>) -> Self {
+        GameMachine { state: core_states::PostAction::<action_states::EndTurn>::default() }
     }
 }

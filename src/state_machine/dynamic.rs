@@ -1,34 +1,41 @@
-use game::GameTriggerState;
-use state_machine::trigger_states;
+use std::convert;
 
-#[derive(Debug, Clone)]
-pub enum EExecutionStates {
-    Invalid,
-    Waiting,
-    Running,
-    Aborted,
-    Finished,
+use game::GameMachine;
+use state_machine::{action_states, core_states, trigger_states, wait_states};
+
+use entities::core_entities::EntityId;
+use game_tags::EGameTags;
+
+impl<T> GameMachine<core_states::Death<T>>
+where
+    T: core_states::StateTriggerable + Default,
+{
+    pub fn death_processing(self) -> Result<Self, String> {
+        unimplemented!()
+    }
 }
 
-type GameTriggerDelegate<T> = fn(GameTriggerState<T>) -> Result<GameTriggerState<T>, EExecutionStates>;
-
-#[derive(Debug, Clone)]
-pub struct MethodTrigger<T>
+impl<T> GameMachine<core_states::Trigger<T>>
 where
-    T: trigger_states::TriggerState,
+	T: core_states::StateTriggerable + Default,
+	GameMachine<core_states::Effect<T>>: convert::From<GameMachine<core_states::Trigger<T>>>,
 {
-    pub(crate) last_state: EExecutionStates,
-    pub(crate) delegate: GameTriggerDelegate<T>,
-}
+    pub fn signal(self, entity: EntityId, tag: EGameTags, old: u32, new: u32)
+    	-> Result<GameMachine<core_states::Death<T>>, String>
+    {
+    	let machine = self;
 
-impl<T> MethodTrigger<T> 
-where
-    T: trigger_states::TriggerState,
-{
-    pub fn new(delegate: GameTriggerDelegate<T>) -> Self {
-        Self {
-            last_state: EExecutionStates::Waiting,
-            delegate: delegate,
-        }
+		// Collect active triggers.
+
+		// Validate collected triggers against current change.
+
+		// Transition to effect state.
+		let machine: GameMachine<core_states::Effect<T>> = machine.into();
+
+		// Execute each trigger.
+
+		// Move into death processing state.
+		// Caller decides if death processing is done or not!
+    	Ok(machine.into())
     }
 }
