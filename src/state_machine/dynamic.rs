@@ -1,12 +1,21 @@
 use std::convert;
 
 use game::GameMachine;
-use state_machine::{action_states, core_states, trigger_states, wait_states};
+use state_machine::{core_states, wait_states};
+use state_machine::action_trigger_states as ats;
 
 use entities::core_entities::EntityId;
 use game_tags::EGameTags;
 
-impl<T> GameMachine<core_states::Death<T>>
+#[derive(Debug)]
+pub enum DynamicOperations {
+    DecreaseOne,
+    IncreaseOne,
+    Increase(u32),
+    Decrease(u32),
+}
+
+impl<'mx, T> GameMachine<'mx, core_states::Death<T>>
 where
     T: core_states::StateTriggerable + Default,
 {
@@ -15,27 +24,23 @@ where
     }
 }
 
-impl<T> GameMachine<core_states::Trigger<T>>
+impl<'mx, T /*, Y */> GameMachine<'mx, core_states::Effect<T>>
 where
 	T: core_states::StateTriggerable + Default,
-	GameMachine<core_states::Effect<T>>: convert::From<GameMachine<core_states::Trigger<T>>>,
+    // Y: core_states::StateTriggerable + Default,
+	// GameMachine<'mx, core_states::Trigger<Y>>: convert::From<GameMachine<'mx, core_states::Effect<T>>>,
+    GameMachine<'mx, core_states::Death<T>>: convert::From<GameMachine<'mx, core_states::Effect<T>>>,
 {
-    pub fn signal(self, entity: EntityId, tag: EGameTags, old: u32, new: u32)
-    	-> Result<GameMachine<core_states::Death<T>>, String>
-    {
-    	let machine = self;
+    pub fn signal(self, entity: EntityId, tag: EGameTags, operation: DynamicOperations) -> Self {
+        // Store effect operations.
+        unimplemented!()
+    }
 
-		// Collect active triggers.
-
-		// Validate collected triggers against current change.
-
-		// Transition to effect state.
-		let machine: GameMachine<core_states::Effect<T>> = machine.into();
-
-		// Execute each trigger.
-
-		// Move into death processing state.
-		// Caller decides if death processing is done or not!
-    	Ok(machine.into())
+    pub fn update(self) -> Result<GameMachine<'mx, core_states::Death<T>>, String> {
+        // Execute all stored operations.
+        // Triggers matching the executed effect are run depth-first.
+        // TODO; Invalidation check for operations under certain circumstances.
+        //      -> Tag values can never be < 0 etc ..
+        unimplemented!()
     }
 }

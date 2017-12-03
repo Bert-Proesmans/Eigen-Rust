@@ -10,8 +10,8 @@ pub trait StateCore {
 }
 
 pub trait StateWaitable {}
-pub trait StateActionable {}
 pub trait StateTriggerable {}
+pub trait StateActionable: StateTriggerable {}
 
 #[derive(Debug)]
 pub struct Wait<T>

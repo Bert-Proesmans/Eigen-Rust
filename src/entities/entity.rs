@@ -3,7 +3,7 @@ use std::fmt;
 use entities::entity_data::EntityData;
 use game_tags::EGameTags;
 
-pub trait IEntity: fmt::Debug {
+pub trait IEntity<'machine>: fmt::Debug {
     fn _get_data_internal(&self) -> &EntityData;
     fn _get_data_internal_mut(&mut self) -> &mut EntityData;
 

@@ -4,24 +4,33 @@ use entities::entity_data::EntityData;
 pub type EntityId = u32;
 pub const GAME_ENTITY_ID: EntityId = 1;
 
-#[derive(Debug, PartialEq, Eq, Hash, Primitive)]
+static DBG_U32: u32 = 0;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Primitive)]
 pub enum EController {
     ControllerOne = 1,
     ControllerTwo = 2
+}
+
+impl EController {
+    pub fn next(self) -> Self {
+        match self {
+            EController::ControllerOne => EController::ControllerTwo,
+            EController::ControllerTwo => EController::ControllerOne,
+        }
+    }
 }
 
 pub const PLAYER_ONE: EController = EController::ControllerOne;
 pub const PLAYER_TWO: EController = EController::ControllerTwo;
 
 #[derive(Debug)]
-pub struct Game {
+pub struct Game<'machine> {
     data: EntityData,
-    // Reference, the referenced object should live
-    // as long as possible!
-    card: u32
+    card: &'machine u32
 }
 
-impl IEntity for Game {
+impl<'mx> IEntity<'mx> for Game<'mx> {
     fn _get_data_internal(&self) -> &EntityData {
         &self.data
     }
@@ -31,24 +40,24 @@ impl IEntity for Game {
     }
 }
 
-impl Game {
+impl<'mx> Game<'mx> {
     pub fn new() -> Result<Self, String> {
         let e_data = try!(EntityData::new(GAME_ENTITY_ID));
 
         Ok(Game {
             data: e_data,
-            card: 0
+            card: &DBG_U32
         })
     }
 }
 
 #[derive(Debug)]
-pub struct Controller {
+pub struct Controller<'machine> {
     data: EntityData,
-    card: u32
+    card: &'machine u32
 }
 
-impl IEntity for Controller {
+impl<'mx> IEntity<'mx> for Controller<'mx> {
     fn _get_data_internal(&self) -> &EntityData {
         &self.data
     }
